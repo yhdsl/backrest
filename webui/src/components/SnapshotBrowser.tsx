@@ -148,7 +148,7 @@ export const SnapshotBrowser = ({
     <SnapshotBrowserContext.Provider
       value={{ snapshotId, repoId, planId, showModal }}
     >
-      <Tree<DataNode> loadData={onLoadData} treeData={treeData} />
+      <Tree<DataNode> loadData={onLoadData} treeData={treeData} showIcon={true} />
     </SnapshotBrowserContext.Provider>
   );
 };
