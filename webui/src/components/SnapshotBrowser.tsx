@@ -25,6 +25,18 @@ import { StringValueSchema } from "../../gen/ts/types/value_pb";
 import { pathSeparator } from "../state/buildcfg";
 import { create, toJsonString } from "@bufbuild/protobuf";
 
+const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+
+function compareFn(a: DataNode, b: DataNode) {
+  if (a.isLeaf === true && b.isLeaf === false) {
+    return 1;
+  }
+  if (a.isLeaf === false && b.isLeaf === true) {
+    return -1;
+  }
+  return collator.compare(a.title, b.title);
+}
+
 const SnapshotBrowserContext = React.createContext<{
   snapshotId: string;
   planId?: string;
@@ -137,8 +149,10 @@ export const SnapshotBrowser = ({
       return treeData.map((node) => {
         const didUpdate = replaceKeyInTree(node, key as string, toUpdateCopy);
         if (didUpdate) {
+          didUpdate.sort(compareFn);
           return didUpdate;
         }
+        node.sort(compareFn);
         return node;
       });
     });
@@ -166,6 +180,7 @@ const respToNodes = (resp: ListSnapshotFilesResponse): DataNode[] => {
       return node;
     });
 
+  nodes.sort(compareFn);
   return nodes;
 };
 
