@@ -8,3 +8,4 @@ cmd/backrest/backrest
 .idea/
 .pnpm-store/
 webui/node_modules
+webui/package-lock.json
