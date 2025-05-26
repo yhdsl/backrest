@@ -35,7 +35,12 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    return collator.compare(a.title.toString().toLowerCase(), b.title.toString().toLowerCase());
+    if (a.title && b.title) {
+      return collator.compare(a.title.toString().toLowerCase(), b.title.toString().toLowerCase());
+    }
+    else {
+      return 0;
+    }
   }
 }
 
@@ -151,10 +156,8 @@ export const SnapshotBrowser = ({
       return treeData.map((node) => {
         const didUpdate = replaceKeyInTree(node, key as string, toUpdateCopy);
         if (didUpdate) {
-          didUpdate.sort(compareFn);
           return didUpdate;
         }
-        node.sort(compareFn);
         return node;
       });
     });
