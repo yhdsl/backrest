@@ -241,7 +241,7 @@ const FileNode = ({ entry }: { entry: LsEntry }) => {
   };
 
   return (
-    <Space onMouseEnter={showDropdown} onMouseLeave={() => setDropdown(null)}>
+    <Space onMouseEnter={showDropdown}>
       {entry.name}
       {entry.type === "file" ? (
         <span className="backrest file-details">
