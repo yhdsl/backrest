@@ -31,10 +31,12 @@ function compareFn(a: DataNode, b: DataNode) {
   if (a.isLeaf === true && b.isLeaf === false) {
     return 1;
   }
-  if (a.isLeaf === false && b.isLeaf === true) {
+  else if (a.isLeaf === false && b.isLeaf === true) {
     return -1;
   }
-  return collator.compare(a.title, b.title);
+  else {
+    return collator.compare(a.title.toLowerCase(), b.title.toLowerCase());
+  }
 }
 
 const SnapshotBrowserContext = React.createContext<{
