@@ -35,7 +35,7 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    return collator.compare(a.title.toLowerCase(), b.title.toLowerCase());
+    return collator.compare(a.title.toString().toLowerCase(), b.title.toString().toLowerCase());
   }
 }
 
