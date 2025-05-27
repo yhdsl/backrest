@@ -192,67 +192,59 @@ const FileNode = ({ entry }: { entry: LsEntry }) => {
     SnapshotBrowserContext
   )!;
 
-  const showDropdown = () => {
-    setDropdown(
-      <Dropdown
-        trigger={['click']}
-        menu={{
-          items: [
-            {
-              key: "info",
-              label: "Info",
-              onClick: () => {
-                showModal(
-                  <Modal
-                    title={"Path Info for " + entry.path}
-                    open={true}
-                    cancelButtonProps={{ style: { display: "none" } }}
-                    onCancel={() => showModal(null)}
-                    onOk={() => showModal(null)}
-                  >
-                    <pre>
-                      {toJsonString(LsEntrySchema, entry, {
-                        prettySpaces: 2,
-                      })}
-                    </pre>
-                  </Modal>
-                );
-              },
-            },
-            {
-              key: "restore",
-              label: "Restore to path",
-              onClick: () => {
-                showModal(
-                  <RestoreModal
-                    path={entry.path!}
-                    repoId={repoId}
-                    planId={planId}
-                    snapshotId={snapshotId}
-                  />
-                );
-              },
-            },
-          ],
-        }}
-      >
-        <a onClick={(e) => e.preventDefault()}>
-          <DownloadOutlined />
-        </a>
-      </Dropdown>
-    );
-  };
-
   return (
-    <Space onMouseEnter={showDropdown} onMouseLeave={() => setDropdown(null)}>
-      {entry.name}
-      {entry.type === "file" ? (
-        <span className="backrest file-details">
+      <Dropdown
+          trigger={['contextMenu']}
+          menu={{
+            items: [
+              {
+                key: "info",
+                label: "详细信息",
+                onClick: () => {
+                  showModal(
+                      <Modal
+                          title={"路径 " + entry.path + " 的详细信息"}
+                          open={true}
+                          cancelButtonProps={{ style: { display: "none" } }}
+                          onCancel={() => showModal(null)}
+                          onOk={() => showModal(null)}
+                      >
+                        <pre>
+                          {toJsonString(LsEntrySchema, entry, {
+                            prettySpaces: 2,
+                          })}
+                        </pre>
+                      </Modal>
+                  );
+                },
+              },
+              {
+                key: "restore",
+                label: "恢复至...",
+                onClick: () => {
+                  showModal(
+                      <RestoreModal
+                          path={entry.path!}
+                          repoId={repoId}
+                          planId={planId}
+                          snapshotId={snapshotId}
+                      />
+                  );
+                },
+              },
+            ],
+          }}
+      >
+        <Space>
+          {entry.name}
+          {entry.type === "file" ? (
+              <span className="backrest file-details">
           ({formatBytes(Number(entry.size))})
         </span>
-      ) : null}
-      {dropdown || <div style={{ width: 16 }}></div>}
-    </Space>
+          ) : null}
+          {dropdown || <div style={{ width: 16 }}></div>}
+        </Space>
+      </Dropdown>
   );
 };
 
