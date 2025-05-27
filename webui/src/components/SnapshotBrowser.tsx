@@ -37,7 +37,18 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    return collator.compare(a.key.toString(), b.key.toString());
+    let a_code = a.key.toString().toLowerCase().charCodeAt(0);
+    let a_is_cjk = 97 <= a_code && a_code <= 122;
+    let b_code = b.key.toString().toLowerCase().charCodeAt(0);
+    let b_is_cjk = 97 <= b_code && b_code <= 122;
+
+    let compare = collator.compare(a.key.toString(), b.key.toString());
+    if (a_is_cjk != b_is_cjk) {
+      return -1 * compare;
+    }
+    else {
+      return compare;
+    }
   }
 }
 
