@@ -195,5 +195,5 @@ changelog:
 
 release:
   github:
-    owner: garethgeorge
+    owner: yhdsl
     name: backrest
