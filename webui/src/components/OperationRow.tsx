@@ -101,9 +101,8 @@ export const OperationRow = ({
       <Modal
         width="70%"
         title={
-          "操作 " +
           opName +
-          " 日志，于 " +
+          "操作日志，于 " +
           formatTime(Number(operation.unixTimeStartMs))
         }
         open={true}

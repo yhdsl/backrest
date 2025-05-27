@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Space } from "antd";
+import { Button, ConfigProvider, Input, Modal, Space } from "antd";
 import React from "react";
 import { useShowModal } from "../components/ModalManager";
 import { backrestService } from "../api";
@@ -15,6 +15,7 @@ import { Repo } from "../../gen/ts/v1/config_pb";
 import { OperationListView } from "../components/OperationListView";
 import { create } from "@bufbuild/protobuf";
 import { useConfig } from "../components/ConfigProvider";
+import zhCN from 'antd/locale/zh_CN';
 
 interface Invocation {
   command: string;
@@ -55,43 +56,45 @@ export const RunCommandModal = ({ repo }: { repo: Repo }) => {
   };
 
   return (
-    <Modal
-      open={true}
-      onCancel={handleCancel}
-      title={"在储存库 " + repo.id + " 上运行命令"}
-      width="80vw"
-      footer={[]}
-    >
-      <Space.Compact style={{ width: "100%" }}>
-        <Input
-          placeholder="运行 restic 命令，例如执行 help 打印帮助文本"
-          value={command}
-          onChange={(e) => setCommand(e.target.value)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
-              doExecute();
-            }
-          }}
-        />
-        <SpinButton type="primary" onClickAsync={doExecute}>
-          执行
-        </SpinButton>
-      </Space.Compact>
-      {running && command ? (
-        <em style={{ color: "gray" }}>
-          警告：已在运行另一个命令。请等待该命令完成后再执行其它需要处理储存库锁定文件的命令。
-        </em>
-      ) : null}
-      <OperationListView
-        req={create(GetOperationsRequestSchema, {
-          selector: {
-            instanceId: config?.instance,
-            repoGuid: repo.guid,
-            planId: "_system_", // run commands are not associated with a plan
-          },
-        })}
-        filter={(op) => op.op.case === "operationRunCommand"}
-      />
-    </Modal>
+      <ConfigProvider locale={zhCN}>
+        <Modal
+            open={true}
+            onCancel={handleCancel}
+            title={"在储存库 " + repo.id + " 上运行命令"}
+            width="80vw"
+            footer={[]}
+        >
+          <Space.Compact style={{ width: "100%" }}>
+            <Input
+                placeholder="运行 restic 命令，例如执行 help 打印帮助文本"
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    doExecute();
+                  }
+                }}
+            />
+            <SpinButton type="primary" onClickAsync={doExecute}>
+              执行
+            </SpinButton>
+          </Space.Compact>
+          {running && command ? (
+              <em style={{ color: "gray" }}>
+                警告：已在运行另一个命令。请等待该命令完成后再执行其它需要处理储存库锁定文件的命令。
+              </em>
+          ) : null}
+          <OperationListView
+              req={create(GetOperationsRequestSchema, {
+                selector: {
+                  instanceId: config?.instance,
+                  repoGuid: repo.guid,
+                  planId: "_system_", // run commands are not associated with a plan
+                },
+              })}
+              filter={(op) => op.op.case === "operationRunCommand"}
+          />
+        </Modal>
+      </ConfigProvider>
   );
 };
