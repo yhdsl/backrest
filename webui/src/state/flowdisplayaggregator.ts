@@ -49,7 +49,7 @@ export const displayInfoForFlow = (ops: Operation[]): FlowDisplayInfo => {
   const duration = Number(firstOp.unixTimeEndMs - firstOp.unixTimeStartMs);
 
   if (firstOp.status === OperationStatus.STATUS_PENDING) {
-    info.subtitleComponents.push("scheduled, waiting");
+    info.subtitleComponents.push("已安排，等待中");
   }
 
   switch (firstOp.op.case) {
@@ -171,25 +171,25 @@ export const getTypeForDisplay = (op: Operation) => {
 export const displayTypeToString = (type: DisplayType) => {
   switch (type) {
     case DisplayType.BACKUP:
-      return "Backup";
+      return "备份(Backup)";
     case DisplayType.SNAPSHOT:
-      return "Snapshot";
+      return "快照(Snapshot)";
     case DisplayType.FORGET:
-      return "Forget";
+      return "忘记(Forget)";
     case DisplayType.PRUNE:
-      return "Prune";
+      return "修剪(Prune)";
     case DisplayType.CHECK:
-      return "Check";
+      return "检查(Check)";
     case DisplayType.RESTORE:
-      return "Restore";
+      return "恢复(Restore)";
     case DisplayType.STATS:
-      return "Stats";
+      return "统计信息";
     case DisplayType.RUNHOOK:
-      return "Run Hook";
+      return "运行钩子函数";
     case DisplayType.RUNCOMMAND:
-      return "Run Command";
+      return "运行命令";
     default:
-      return "Unknown";
+      return "未知";
   }
 };
 
@@ -215,20 +215,20 @@ export const colorForStatus = (status: OperationStatus) => {
 export const nameForStatus = (status: OperationStatus) => {
   switch (status) {
     case OperationStatus.STATUS_PENDING:
-      return "pending";
+      return "等待中";
     case OperationStatus.STATUS_INPROGRESS:
-      return "in progress";
+      return "执行中";
     case OperationStatus.STATUS_ERROR:
-      return "error";
+      return "错误";
     case OperationStatus.STATUS_WARNING:
-      return "warning";
+      return "警告";
     case OperationStatus.STATUS_SUCCESS:
-      return "success";
+      return "成功";
     case OperationStatus.STATUS_USER_CANCELLED:
-      return "cancelled";
+      return "取消";
     case OperationStatus.STATUS_SYSTEM_CANCELLED:
-      return "cancelled";
+      return "取消";
     default:
-      return "Unknown";
+      return "未知";
   }
 }

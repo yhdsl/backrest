@@ -117,7 +117,7 @@ export const SummaryDashboard = () => {
             },
             {
               key: 2,
-              label: "数据文件夹",
+              label: "数据文件夹路径",
               children: summaryData.dataPath,
             },
           ]}
@@ -209,22 +209,22 @@ const SummaryPanel = ({
   cardInfo.push(
     {
       key: 1,
-      label: "备份 (30d)",
+      label: "备份摘要 (30d)",
       children: (
         <>
           {summary.backupsSuccessLast30days ? (
             <Typography.Text type="success" style={{ marginRight: "5px" }}>
-              {summary.backupsSuccessLast30days + ""} 成功
+              成功数 {"" + summary.backupsSuccessLast30days}
             </Typography.Text>
           ) : undefined}
           {summary.backupsFailed30days ? (
             <Typography.Text type="danger" style={{ marginRight: "5px" }}>
-              {summary.backupsFailed30days + ""} 失败
+              失败数 {"" + summary.backupsFailed30days }
             </Typography.Text>
           ) : undefined}
           {summary.backupsWarningLast30days ? (
             <Typography.Text type="warning" style={{ marginRight: "5px" }}>
-              {summary.backupsWarningLast30days + ""} 警告
+              警告数 {"" + summary.backupsWarningLast30days}
             </Typography.Text>
           ) : undefined}
         </>

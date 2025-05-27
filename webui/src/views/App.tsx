@@ -9,7 +9,7 @@ import {
   LoadingOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Button, Empty, Layout, Menu, Spin, theme } from "antd";
+import { Button, ConfigProvider, Empty, Layout, Menu, Spin, theme } from "antd";
 import { Config } from "../../gen/ts/v1/config_pb";
 import { useAlertApi } from "../components/Alerts";
 import { useShowModal } from "../components/ModalManager";
@@ -33,6 +33,7 @@ import { getStatusForSelector, matchSelector } from "../state/logstate";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { MainContentAreaTemplate } from "./MainContentArea";
 import { create } from "@bufbuild/protobuf";
+import zhCN from 'antd/locale/zh_CN';
 
 const { Header, Sider } = Layout;
 
@@ -117,110 +118,112 @@ export const App: React.FC = () => {
   const items = getSidenavItems(config);
 
   return (
-    <Layout style={{ height: "auto", minHeight: "100vh" }}>
-      <Header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-          height: "60px",
-          backgroundColor: "#1b232c",
-        }}
-      >
-        <a
-          style={{ color: colorTextLightSolid }}
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <img
-            src={LogoSvg}
-            style={{
-              height: "30px",
-              color: "white",
-              marginBottom: "-8px",
-              paddingRight: "10px",
-            }}
-          />
-        </a>
-        <h1>
-          <a href="https://github.com/garethgeorge/backrest" target="_blank">
-            <small
-              style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.6em" }}
-            >
-              {uiBuildVersion}
-            </small>
-          </a>
-          <small style={{ fontSize: "0.6em", marginLeft: "30px" }}>
-            <ActivityBar />
-          </small>
-        </h1>
-        <h1 style={{ position: "absolute", right: "20px" }}>
-          <small style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.6em" }}>
-            {config && config.instance ? config.instance : undefined}
-          </small>
-          <Button
-            type="text"
-            style={{
-              marginLeft: "10px",
-              color: "white",
-              visibility: config?.auth?.disabled ? "hidden" : "visible",
-            }}
-            onClick={() => {
-              setAuthToken("");
-              window.location.reload();
-            }}
+      <ConfigProvider locale={zhCN}>
+        <Layout style={{ height: "auto", minHeight: "100vh" }}>
+          <Header
+              style={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                height: "60px",
+                backgroundColor: "#1b232c",
+              }}
           >
-            登出
-          </Button>
-        </h1>
-      </Header>
-      <Layout>
-        <Sider width={300} style={{ background: colorBgContainer }}>
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={["1"]}
-            defaultOpenKeys={["plans", "repos"]}
-            style={{ height: "100%", borderRight: 0 }}
-            items={items}
-          />
-        </Sider>
-        <AuthenticationBoundary>
-          <Suspense fallback={<Spin />}>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <MainContentAreaTemplate breadcrumbs={[{ title: "Summary" }]}>
-                    <SummaryDashboard />
-                  </MainContentAreaTemplate>
-                }
+            <a
+                style={{ color: colorTextLightSolid }}
+                onClick={() => {
+                  navigate("/");
+                }}
+            >
+              <img
+                  src={LogoSvg}
+                  style={{
+                    height: "30px",
+                    color: "white",
+                    marginBottom: "-8px",
+                    paddingRight: "10px",
+                  }}
               />
-              <Route
-                path="/getting-started"
-                element={
-                  <MainContentAreaTemplate
-                    breadcrumbs={[{ title: "快速入门" }]}
-                  >
-                    <GettingStartedGuide />
-                  </MainContentAreaTemplate>
-                }
+            </a>
+            <h1>
+              <a href="https://github.com/garethgeorge/backrest" target="_blank">
+                <small
+                    style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.6em" }}
+                >
+                  {uiBuildVersion}
+                </small>
+              </a>
+              <small style={{ fontSize: "0.6em", marginLeft: "30px" }}>
+                <ActivityBar />
+              </small>
+            </h1>
+            <h1 style={{ position: "absolute", right: "20px" }}>
+              <small style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.6em" }}>
+                {config && config.instance ? config.instance : undefined}
+              </small>
+              <Button
+                  type="text"
+                  style={{
+                    marginLeft: "10px",
+                    color: "white",
+                    visibility: config?.auth?.disabled ? "hidden" : "visible",
+                  }}
+                  onClick={() => {
+                    setAuthToken("");
+                    window.location.reload();
+                  }}
+              >
+                登出
+              </Button>
+            </h1>
+          </Header>
+          <Layout>
+            <Sider width={300} style={{ background: colorBgContainer }}>
+              <Menu
+                  mode="inline"
+                  defaultSelectedKeys={["1"]}
+                  defaultOpenKeys={["plans", "repos"]}
+                  style={{ height: "100%", borderRight: 0 }}
+                  items={items}
               />
-              <Route path="/plan/:planId" element={<PlanViewContainer />} />
-              <Route path="/repo/:repoId" element={<RepoViewContainer />} />
-              <Route
-                path="/*"
-                element={
-                  <MainContentAreaTemplate breadcrumbs={[]}>
-                    <Empty description="页面未找到" />
-                  </MainContentAreaTemplate>
-                }
-              />
-            </Routes>
-          </Suspense>
-        </AuthenticationBoundary>
-      </Layout>
-    </Layout>
+            </Sider>
+            <AuthenticationBoundary>
+              <Suspense fallback={<Spin />}>
+                <Routes>
+                  <Route
+                      path="/"
+                      element={
+                        <MainContentAreaTemplate breadcrumbs={[{ title: "摘要" }]}>
+                          <SummaryDashboard />
+                        </MainContentAreaTemplate>
+                      }
+                  />
+                  <Route
+                      path="/getting-started"
+                      element={
+                        <MainContentAreaTemplate
+                            breadcrumbs={[{ title: "快速入门" }]}
+                        >
+                          <GettingStartedGuide />
+                        </MainContentAreaTemplate>
+                      }
+                  />
+                  <Route path="/plan/:planId" element={<PlanViewContainer />} />
+                  <Route path="/repo/:repoId" element={<RepoViewContainer />} />
+                  <Route
+                      path="/*"
+                      element={
+                        <MainContentAreaTemplate breadcrumbs={[]}>
+                          <Empty description="页面未找到" />
+                        </MainContentAreaTemplate>
+                      }
+                  />
+                </Routes>
+              </Suspense>
+            </AuthenticationBoundary>
+          </Layout>
+        </Layout>
+      </ConfigProvider>
   );
 };
 

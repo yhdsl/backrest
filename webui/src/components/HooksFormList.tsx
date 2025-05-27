@@ -250,7 +250,7 @@ const hookTypes: {
             rules={[requiredField("webhook URL 为必填项")]}
           >
             <Input
-              addonBefore={<div style={{ width: "8em" }}>Discord 网络钩子(Webhook)</div>}
+              addonBefore={<div style={{ width: "8em" }}>Discord Webhook</div>}
             />
           </Form.Item>
           文本模板:
@@ -348,7 +348,7 @@ const hookTypes: {
             rules={[requiredField("webhook URL 为必填项")]}
           >
             <Input
-              addonBefore={<div style={{ width: "8em" }}>Slack 网络钩子(Webhook)</div>}
+              addonBefore={<div style={{ width: "8em" }}>Slack Webhook</div>}
             />
           </Form.Item>
           文本模板:
