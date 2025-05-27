@@ -756,11 +756,13 @@ const envVarSetValidator = (form: FormInstance<any>, envVars: string[]) => {
 
   // check that password is provided in some form
   const password = form.getFieldValue("password");
+  const flags = form.getFieldValue("flags");
   if (
     (!password || password.length === 0) &&
     !envVarNames.includes("RESTIC_PASSWORD") &&
     !envVarNames.includes("RESTIC_PASSWORD_COMMAND") &&
-    !envVarNames.includes("RESTIC_PASSWORD_FILE")
+    !envVarNames.includes("RESTIC_PASSWORD_FILE") &&
+    !flags.includes("--insecure-no-password")
   ) {
     return Promise.reject(
       new Error(
