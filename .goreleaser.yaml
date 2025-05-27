@@ -77,92 +77,92 @@ archives:
       - CHANGELOG.md
     allow_different_binary_count: true
 
-dockers:
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-alpine-amd64
-    dockerfile: Dockerfile.alpine
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-alpine-arm64
-    dockerfile: Dockerfile.alpine
-    goarch: arm64
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64/v8"
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-arm64
-    dockerfile: Dockerfile.scratch
-    goarch: arm64
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64/v8"
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-amd64
-    dockerfile: Dockerfile.scratch
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-armv6
-    dockerfile: Dockerfile.scratch
-    use: buildx
-    goarch: arm
-    goarm: 6
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm/v6"
-
-docker_manifests:
-  - name_template: "garethgeorge/backrest:latest"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:{{ .Tag }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:latest-alpine"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:{{ .Tag }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#dockers:
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-alpine-amd64
+#    dockerfile: Dockerfile.alpine
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/amd64"
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-alpine-arm64
+#    dockerfile: Dockerfile.alpine
+#    goarch: arm64
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm64/v8"
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-arm64
+#    dockerfile: Dockerfile.scratch
+#    goarch: arm64
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm64/v8"
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-amd64
+#    dockerfile: Dockerfile.scratch
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/amd64"
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-armv6
+#    dockerfile: Dockerfile.scratch
+#    use: buildx
+#    goarch: arm
+#    goarm: 6
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm/v6"
+#
+#docker_manifests:
+#  - name_template: "garethgeorge/backrest:latest"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:{{ .Tag }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:latest-alpine"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:{{ .Tag }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
 
 brews:
   - name: backrest
