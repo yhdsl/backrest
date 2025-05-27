@@ -102,7 +102,7 @@ export const OperationRow = ({
         width="70%"
         title={
           opName +
-          "操作日志，于 " +
+          "的操作日志，于 " +
           formatTime(Number(operation.unixTimeStartMs))
         }
         open={true}

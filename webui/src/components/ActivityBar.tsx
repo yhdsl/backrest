@@ -66,7 +66,7 @@ export const ActivityBar = () => {
 
         return (
           <span key={idx} style={{ marginRight: "2em" }}>
-            根据调度计划 {op.planId} 运行 {displayName}({op.repoId}) 中，剩余时间{" "}
+            根据调度计划 {op.planId} 对 {op.repoId} 运行 {displayName} 操作中，剩余时间{" "}
             {formatDuration(Date.now() - Number(op.unixTimeStartMs))}
           </span>
         );
