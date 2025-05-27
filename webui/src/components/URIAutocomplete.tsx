@@ -38,7 +38,7 @@ export const URIAutocomplete = (props: React.PropsWithChildren<any>) => {
         setOptions(vals);
       })
       .catch((e) => {
-        console.log("Path autocomplete error: ", e);
+        console.log("自动完成路径时出错: ", e);
       });
   }, 200);
 
@@ -55,12 +55,12 @@ export const URIAutocomplete = (props: React.PropsWithChildren<any>) => {
               if (isWindows) {
                 if (value.match(/^[a-zA-Z]:\\$/)) {
                   return Promise.reject(
-                    new Error("Path must start with a drive letter e.g. C:\\")
+                    new Error("路径必须以驱动器盘符开头，例如 C:\\")
                   );
                 } else if (value.includes("/")) {
                   return Promise.reject(
                     new Error(
-                      "Path must use backslashes e.g. C:\\Users\\MyUsers\\Documents"
+                      "路径必须使用反斜杠，例如 C:\\Users\\MyUsers\\Documents"
                     )
                   );
                 }

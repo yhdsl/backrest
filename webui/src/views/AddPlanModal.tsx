@@ -88,7 +88,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
 
     try {
       if (!template) {
-        throw new Error("template not found");
+        throw new Error("未找到模板");
       }
 
       const configCopy = clone(ConfigSchema, config);
@@ -96,7 +96,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
       // Remove the plan from the config
       const idx = configCopy.plans.findIndex((r) => r.id === template.id);
       if (idx === -1) {
-        throw new Error("failed to update config, plan to delete not found");
+        throw new Error("更新配置文件时出错，未找到待删除的调度计划");
       }
       configCopy.plans.splice(idx, 1);
 
@@ -105,11 +105,11 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
       showModal(null);
 
       alertsApi.success(
-        "Plan deleted from config, but not from restic repo. Snapshots will remain in storage and operations will be tracked until manually deleted. Reusing a deleted plan ID is not recommended if backups have already been performed.",
+        "该调度计划已从配置文件中删除，但尚未从 Restic 储存库中删除。快照将保留在储存库中，并且会继续跟踪相关操作，直到手动删除为止。如果已执行备份，则不建议重复使用已被删除的调度计划ID。",
         30
       );
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Destroy error:"), 15);
+      alertsApi.error(formatErrorAlert(e, "销毁错误:"), 15);
     } finally {
       setConfirmLoading(false);
     }
@@ -141,7 +141,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
       if (template) {
         const idx = configCopy.plans.findIndex((r) => r.id === template.id);
         if (idx === -1) {
-          throw new Error("failed to update plan, not found");
+          throw new Error("更新调度计划时出错，未找到该调度计划");
         }
         configCopy.plans[idx] = plan;
       } else {
@@ -152,7 +152,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
       setConfig(await backrestService.setConfig(configCopy));
       showModal(null);
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Operation error: "), 15);
+      alertsApi.error(formatErrorAlert(e, "操作错误: "), 15);
       console.error(e);
     } finally {
       setConfirmLoading(false);
@@ -170,11 +170,11 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
       <Modal
         open={true}
         onCancel={handleCancel}
-        title={template ? "Update Plan" : "Add Plan"}
+        title={template ? "更新调度计划" : "添加调度计划"}
         width="60vw"
         footer={[
           <Button loading={confirmLoading} key="back" onClick={handleCancel}>
-            Cancel
+            取消
           </Button>,
           template != null ? (
             <ConfirmButton
@@ -182,26 +182,26 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
               type="primary"
               danger
               onClickAsync={handleDestroy}
-              confirmTitle="Confirm Delete"
+              confirmTitle="确认删除？"
             >
-              Delete
+              删除
             </ConfirmButton>
           ) : null,
           <SpinButton key="submit" type="primary" onClickAsync={handleOk}>
-            Submit
+            提交
           </SpinButton>,
         ]}
         maskClosable={false}
       >
         <p>
-          See{" "}
+          查看{" "}
           <a
             href="https://garethgeorge.github.io/backrest/introduction/getting-started"
             target="_blank"
           >
             backrest getting started guide
           </a>{" "}
-          for plan configuration instructions.
+          以了解如何配置调度计划。
         </p>
         <br />
         <Form
@@ -212,31 +212,31 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           disabled={confirmLoading}
         >
           {/* Plan.id */}
-          <Tooltip title="Unique ID that identifies this plan in the backrest UI (e.g. s3-myplan). This cannot be changed after creation.">
+          <Tooltip title="后台用于识别该调度计划的唯一标识名称，例如s3-myplan。注意创建后将无法修改。">
             <Form.Item<Plan>
               hasFeedback
               name="id"
-              label="Plan Name"
+              label="调度计划名称"
               initialValue={template ? template.id : ""}
               validateTrigger={["onChange", "onBlur"]}
               rules={[
                 {
                   required: true,
-                  message: "Please input plan name",
+                  message: "请输入调度计划名称",
                 },
                 {
                   validator: async (_, value) => {
                     if (template) return;
                     if (config?.plans?.find((r) => r.id === value)) {
-                      throw new Error("Plan with name already exists");
+                      throw new Error("调度计划名称已存在");
                     }
                   },
-                  message: "Plan with name already exists",
+                  message: "调度计划名称已存在",
                 },
                 {
                   pattern: namePattern,
                   message:
-                    "Name must be alphanumeric with dashes or underscores as separators",
+                    "名称中只能包含数字和字母，以及连接符 - 或下划线 _",
                 },
               ]}
             >
@@ -248,16 +248,16 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           </Tooltip>
 
           {/* Plan.repo */}
-          <Tooltip title="The repo that backrest will store your snapshots in.">
+          <Tooltip title="Backrest 用于储存快照的储存库地址">
             <Form.Item<Plan>
               name="repo"
-              label="Repository"
+              label="储存库"
               validateTrigger={["onChange", "onBlur"]}
               initialValue={template ? template.repo : ""}
               rules={[
                 {
                   required: true,
-                  message: "Please select repository",
+                  message: "请选择一个储存库",
                 },
               ]}
             >
@@ -272,7 +272,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           </Tooltip>
 
           {/* Plan.paths */}
-          <Form.Item label="Paths" required={true}>
+          <Form.Item label="路径" required={true}>
             <Form.List
               name="paths"
               rules={[]}
@@ -289,6 +289,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                         rules={[
                           {
                             required: true,
+                            message: "请输入路径地址",
                           },
                         ]}
                         noStyle
@@ -312,7 +313,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                       style={{ width: "90%" }}
                       icon={<PlusOutlined />}
                     >
-                      Add Path
+                      添加路径
                     </Button>
                     <Form.ErrorList errors={errors} />
                   </Form.Item>
@@ -325,18 +326,18 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           <Tooltip
             title={
               <>
-                Paths to exclude from your backups. See the{" "}
+                指定不会备份至储存库数据的排除规则。查看{" "}
                 <a
                   href="https://restic.readthedocs.io/en/latest/040_backup.html#excluding-files"
                   target="_blank"
                 >
-                  restic docs
+                  restic 文档
                 </a>{" "}
-                for more info.
+                了解更多信息。
               </>
             }
           >
-            <Form.Item label="Excludes" required={false}>
+            <Form.Item label="排除规则" required={false}>
               <Form.List
                 name="excludes"
                 rules={[]}
@@ -353,6 +354,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                           rules={[
                             {
                               required: true,
+                              message: "请输入排除规则",
                             },
                           ]}
                           noStyle
@@ -377,7 +379,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                         style={{ width: "90%" }}
                         icon={<PlusOutlined />}
                       >
-                        Add Exclusion Glob
+                        添加排除规则模式
                       </Button>
                       <Form.ErrorList errors={errors} />
                     </Form.Item>
@@ -391,18 +393,18 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           <Tooltip
             title={
               <>
-                Case insensitive paths to exclude from your backups. See the{" "}
+                指定不会备份至储存库数据的排除规则 (不区分大小写)。查看{" "}
                 <a
                   href="https://restic.readthedocs.io/en/latest/040_backup.html#excluding-files"
                   target="_blank"
                 >
-                  restic docs
+                  restic 文档
                 </a>{" "}
-                for more info.
+                了解更多信息。
               </>
             }
           >
-            <Form.Item label="Excludes (Case Insensitive)" required={false}>
+            <Form.Item label="排除规则 (不区分大小写)" required={false}>
               <Form.List
                 name="iexcludes"
                 rules={[]}
@@ -419,6 +421,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                           rules={[
                             {
                               required: true,
+                              message: "请输入排除规则",
                             },
                           ]}
                           noStyle
@@ -443,7 +446,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                         style={{ width: "90%" }}
                         icon={<PlusOutlined />}
                       >
-                        Add Case Insensitive Exclusion Glob
+                        添加排除规则模式 (不区分大小写)
                       </Button>
                       <Form.ErrorList errors={errors} />
                     </Form.Item>
@@ -454,7 +457,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           </Tooltip>
 
           {/* Plan.cron */}
-          <Form.Item label="Backup Schedule">
+          <Form.Item label="备份调度">
             <ScheduleFormItem
               name={["schedule"]}
               defaults={ScheduleDefaultsDaily}
@@ -464,8 +467,8 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           {/* Plan.backup_flags */}
           <Form.Item
             label={
-              <Tooltip title="Extra flags to add to the 'restic backup' command">
-                Backup Flags
+              <Tooltip title="待添加至 'restic backup' 命令中的额外 flag">
+                额外命令 Flag
               </Tooltip>
             }
           >
@@ -483,7 +486,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                             whitespace: true,
                             pattern: /^\-\-?.*$/,
                             message:
-                              "Value should be a CLI flag e.g. see restic backup --help",
+                              "输入应当为一个命令行 flag，查看命令 restic backup --help 输出了解可用的 flag",
                           },
                         ]}
                         noStyle
@@ -504,7 +507,7 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                       style={{ width: "90%" }}
                       icon={<PlusOutlined />}
                     >
-                      Set Flag
+                      添加 Flag
                     </Button>
                     <Form.ErrorList errors={errors} />
                   </Form.Item>
@@ -518,19 +521,19 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
 
           {/* Plan.hooks */}
           <Form.Item
-            label={<Tooltip title={hooksListTooltipText}>Hooks</Tooltip>}
+            label={<Tooltip title={hooksListTooltipText}>钩子函数</Tooltip>}
           >
             <HooksFormList />
           </Form.Item>
 
-          <Form.Item shouldUpdate label="Preview">
+          <Form.Item shouldUpdate label="预览">
             {() => (
               <Collapse
                 size="small"
                 items={[
                   {
                     key: "1",
-                    label: "Plan Config as JSON",
+                    label: "使用 JSON 预览调度计划配置",
                     children: (
                       <Typography>
                         <pre>
@@ -601,9 +604,9 @@ const RetentionPolicyView = () => {
     elem = (
       <>
         <p>
-          All backups are retained e.g. for append-only repos. Ensure that you
-          manually forget / prune backups elsewhere. Backrest will register
-          forgets performed externally on the next backup.
+          所有的备份都将会被保留，例如应用于仅追加式备份的方案。
+          请确保定时手动对不需要的备份执行忘记(forget)和修剪(prune)操作。
+          Backrest 将会在下次执行备份操作时自动记录外部执行的忘记(forget)操作。
         </p>
         <Form.Item
           name={["retention", "policyKeepAll"]}
@@ -624,12 +627,12 @@ const RetentionPolicyView = () => {
         rules={[
           {
             required: true,
-            message: "Please input keep last N",
+            message: "请输入至少保留的快照数目",
           },
         ]}
       >
         <InputNumber
-          addonBefore={<div style={{ width: "5em" }}>Count</div>}
+          addonBefore={<div style={{ width: "5em" }}>快照数目</div>}
           type="number"
         />
       </Form.Item>
@@ -646,7 +649,7 @@ const RetentionPolicyView = () => {
               required={false}
             >
               <InputNumber
-                addonBefore={<div style={{ width: "5em" }}>Yearly</div>}
+                addonBefore={<div style={{ width: "5em" }}>每年</div>}
                 type="number"
               />
             </Form.Item>
@@ -657,7 +660,7 @@ const RetentionPolicyView = () => {
               required={false}
             >
               <InputNumber
-                addonBefore={<div style={{ width: "5em" }}>Monthly</div>}
+                addonBefore={<div style={{ width: "5em" }}>每月</div>}
                 type="number"
               />
             </Form.Item>
@@ -668,7 +671,7 @@ const RetentionPolicyView = () => {
               required={false}
             >
               <InputNumber
-                addonBefore={<div style={{ width: "5em" }}>Weekly</div>}
+                addonBefore={<div style={{ width: "5em" }}>每周</div>}
                 type="number"
               />
             </Form.Item>
@@ -681,7 +684,7 @@ const RetentionPolicyView = () => {
               required={false}
             >
               <InputNumber
-                addonBefore={<div style={{ width: "5em" }}>Daily</div>}
+                addonBefore={<div style={{ width: "5em" }}>每天</div>}
                 type="number"
               />
             </Form.Item>
@@ -692,7 +695,7 @@ const RetentionPolicyView = () => {
               required={false}
             >
               <InputNumber
-                addonBefore={<div style={{ width: "5em" }}>Hourly</div>}
+                addonBefore={<div style={{ width: "5em" }}>每小时</div>}
                 type="number"
               />
             </Form.Item>
@@ -700,7 +703,7 @@ const RetentionPolicyView = () => {
         </Row>
         <Form.Item
           name={["retention", "policyTimeBucketed", "keepLastN"]}
-          label="Latest snapshots to keep regardless of age"
+          label="无视时间要求保留的快照数目"
           validateTrigger={["onChange", "onBlur"]}
           initialValue={0}
           required={cronIsSubHourly}
@@ -708,11 +711,11 @@ const RetentionPolicyView = () => {
             {
               validator: async (_, value) => {
                 if (cronIsSubHourly && !(value > 1)) {
-                  throw new Error("Specify a number greater than 1");
+                  throw new Error("请输入大于 1 的数字");
                 }
               },
               message:
-                "Your schedule runs more than once per hour; choose how many snapshots to keep before handing off to the retention policy.",
+                "该调度计划每小时将运行多次，请指定在执行保留策略之前需要保留多少个快照。",
             },
           ]}
         >
@@ -723,9 +726,9 @@ const RetentionPolicyView = () => {
               <Tooltip
                 title={
                   minRetention
-                    ? `${retention?.policyTimeBucketed?.keepLastN} snapshots represents an expected retention duration of at least 
-                ${minRetention}, but this may vary with manual backups or if intermittently online.`
-                    : "Choose how many snapshots to retain, then use the calculator to see the expected duration they would cover."
+                    ? `最近至少 ${minRetention} 中将保留 ${retention?.policyTimeBucketed?.keepLastN}  个快照，
+                但由于手动操作或者设备离线，可能会发生变化。`
+                    : "选择待保留的快照数目，然后继续悬浮以查看预计覆盖的持续时间。"
                 }
               >
                 <CalculatorOutlined
@@ -744,7 +747,7 @@ const RetentionPolicyView = () => {
 
   return (
     <>
-      <Form.Item label="Retention Policy">
+      <Form.Item label="保留策略">
         <Row>
           <Radio.Group
             value={mode}
@@ -768,18 +771,18 @@ const RetentionPolicyView = () => {
             }}
           >
             <Radio.Button value={"policyKeepLastN"}>
-              <Tooltip title="The last N snapshots will be kept by restic. Retention policy is applied to drop older snapshots after each backup run.">
-                By Count
+              <Tooltip title="Restic 将保留最后N个快照。保留策略用于在每次备份操作结束后删除较旧的快照。">
+                数量
               </Tooltip>
             </Radio.Button>
             <Radio.Button value={"policyTimeBucketed"}>
-              <Tooltip title="Snapshots older than the specified time period will be dropped by restic. Retention policy is applied to drop older snapshots after each backup run.">
-                By Time Period
+              <Tooltip title="Restic 将删除超过指定时间段的快照。保留策略用于在每次备份操作结束后删除较旧的快照。">
+                时间间隔
               </Tooltip>
             </Radio.Button>
             <Radio.Button value={"policyKeepAll"}>
-              <Tooltip title="All backups will be retained. Note that this may result in slow backups if the set of snapshots grows very large.">
-                None
+              <Tooltip title="所有的快照都将会被保留。注意，非常大的储存库可能会导致过慢的备份操作。">
+                无
               </Tooltip>
             </Radio.Button>
           </Radio.Group>

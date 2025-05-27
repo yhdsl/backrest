@@ -75,17 +75,17 @@ export const SettingsModal = () => {
 
       if (!newConfig.auth?.users && !newConfig.auth?.disabled) {
         throw new Error(
-          "At least one user must be configured or authentication must be disabled"
+          "必须添加一个用户账户或者禁用身份验证"
         );
       }
 
       setConfig(await backrestService.setConfig(newConfig));
-      alertsApi.success("Settings updated", 5);
+      alertsApi.success("已更新设置", 5);
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Operation error: "), 15);
+      alertsApi.error(formatErrorAlert(e, "操作错误: "), 15);
       console.error(e);
     }
   };
@@ -101,14 +101,14 @@ export const SettingsModal = () => {
       <Modal
         open={true}
         onCancel={handleCancel}
-        title={"Settings"}
+        title={"设置"}
         width="40vw"
         footer={[
           <Button key="back" onClick={handleCancel}>
-            Cancel
+            取消
           </Button>,
           <Button key="submit" type="primary" onClick={handleOk}>
-            Submit
+            提交
           </Button>,
         ]}
       >
@@ -120,51 +120,48 @@ export const SettingsModal = () => {
         >
           {users.length > 0 || config.auth?.disabled ? null : (
             <>
-              <strong>Initial backrest setup! </strong>
+              <strong>初始化 backrest 设置！ </strong>
               <p>
-                Backrest has detected that you do not have any users configured,
-                please add at least one user to secure the web interface.
+                Backrest 检测到您没有添加任何用户账户，请至少添加一位用户账户以保护 Web 界面的安全。
               </p>
               <p>
-                You can add more users later or, if you forget your password,
-                reset users by editing the configuration file (typically in
-                $HOME/.backrest/config.json)
+                您稍后可以添加更多用户账户，或者如果您忘记了密码，可以通过编辑配置文件 (通常位于 $HOME/.backrest/config.json) 来重置用户账户
               </p>
             </>
           )}
-          <Tooltip title="The instance name will be used to identify this backrest install. Pick a value carefully as it cannot be changed later.">
+          <Tooltip title="用于识别该 backrest 的唯一实例名称。请谨慎设置该值，创建后将无法修改。">
             <Form.Item
               hasFeedback
               name="instance"
-              label="Instance ID"
+              label="实例 ID"
               required
               initialValue={config.instance || ""}
               rules={[
-                { required: true, message: "Instance ID is required" },
+                { required: true, message: "实例 ID 为必填项" },
                 {
                   pattern: namePattern,
                   message:
-                    "Instance ID must be alphanumeric with '_-.' allowed as separators",
+                    "实例 ID 中只能包含数字和字母，以及连接符 - 或下划线 _",
                 },
               ]}
             >
               <Input
                 placeholder={
-                  "Unique instance ID for this instance (e.g. my-backrest-server)"
+                  "该 backrest 安装的唯一实例名称 ，例如my-backrest-server"
                 }
                 disabled={!!config.instance}
               />
             </Form.Item>
           </Tooltip>
           <Form.Item
-            label="Disable Authentication"
+            label="禁用身份验证"
             name={["auth", "disabled"]}
             valuePropName="checked"
             initialValue={config.auth?.disabled || false}
           >
             <Checkbox />
           </Form.Item>
-          <Form.Item label="Users" required={true}>
+          <Form.Item label="用户账户" required={true}>
             <Form.List
               name={["auth", "users"]}
               initialValue={
@@ -182,15 +179,15 @@ export const SettingsModal = () => {
                           <Form.Item
                             name={[field.name, "name"]}
                             rules={[
-                              { required: true, message: "Name is required" },
+                              { required: true, message: "用户名为必填项" },
                               {
                                 pattern: namePattern,
                                 message:
-                                  "Name must be alphanumeric with dashes or underscores as separators",
+                                  "用户名中只能包含数字和字母，以及连接符 - 或下划线 _",
                               },
                             ]}
                           >
-                            <Input placeholder="Username" />
+                            <Input placeholder="用户名" />
                           </Form.Item>
                         </Col>
                         <Col span={11}>
@@ -199,12 +196,12 @@ export const SettingsModal = () => {
                             rules={[
                               {
                                 required: true,
-                                message: "Password is required",
+                                message: "密码为必填项",
                               },
                             ]}
                           >
                             <Input.Password
-                              placeholder="Password"
+                              placeholder="密码"
                               onFocus={() => {
                                 form.setFieldValue(
                                   ["auth", "users", index, "needsBcrypt"],
@@ -236,7 +233,7 @@ export const SettingsModal = () => {
                       }}
                       block
                     >
-                      <PlusOutlined /> Add user
+                      <PlusOutlined /> 添加用户账户
                     </Button>
                   </Form.Item>
                 </>
@@ -244,14 +241,14 @@ export const SettingsModal = () => {
             </Form.List>
           </Form.Item>
 
-          <Form.Item shouldUpdate label="Preview">
+          <Form.Item shouldUpdate label="预览">
             {() => (
               <Collapse
                 size="small"
                 items={[
                   {
                     key: "1",
-                    label: "Config as JSON",
+                    label: "使用 JSON 预览配置文件",
                     children: (
                       <Typography>
                         <pre>

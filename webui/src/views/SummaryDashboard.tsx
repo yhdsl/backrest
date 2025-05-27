@@ -61,7 +61,7 @@ export const SummaryDashboard = () => {
         const data = await backrestService.getSummaryDashboard({});
         setSummaryData(data);
       } catch (e) {
-        alertApi.error("Failed to fetch summary data: " + e);
+        alertApi.error("获取摘要数据时出错: " + e);
       }
     };
 
@@ -88,36 +88,36 @@ export const SummaryDashboard = () => {
   return (
     <>
       <Flex gap={16} vertical>
-        <Typography.Title level={3}>Repos</Typography.Title>
+        <Typography.Title level={3}>储存库</Typography.Title>
         {summaryData && summaryData.repoSummaries.length > 0 ? (
           summaryData.repoSummaries.map((summary) => (
             <SummaryPanel summary={summary} key={summary.id} />
           ))
         ) : (
-          <Empty description="No repos found" />
+          <Empty description="未找到储存库" />
         )}
-        <Typography.Title level={3}>Plans</Typography.Title>
+        <Typography.Title level={3}>调度计划</Typography.Title>
         {summaryData && summaryData.planSummaries.length > 0 ? (
           summaryData.planSummaries.map((summary) => (
             <SummaryPanel summary={summary} key={summary.id} />
           ))
         ) : (
-          <Empty description="No plans found" />
+          <Empty description="未找到调度计划" />
         )}
         <Divider />
-        <Typography.Title level={3}>System Info</Typography.Title>
+        <Typography.Title level={3}>系统信息</Typography.Title>
         <Descriptions
           layout="vertical"
           column={2}
           items={[
             {
               key: 1,
-              label: "Config Path",
+              label: "配置文件路径",
               children: summaryData.configPath,
             },
             {
               key: 2,
-              label: "Data Directory",
+              label: "数据文件夹",
               children: summaryData.dataPath,
             },
           ]}
@@ -126,7 +126,7 @@ export const SummaryDashboard = () => {
           size="small"
           items={[
             {
-              label: "Config as JSON",
+              label: "使用 JSON 预览配置文件",
               children: (
                 <pre>
                   {config &&
@@ -187,15 +187,15 @@ const SummaryPanel = ({
 
     return (
       <Card style={{ opacity: 0.9 }} size="small" key={label}>
-        <Typography.Text>Backup at {formatTime(entry.time)}</Typography.Text>{" "}
+        <Typography.Text>备份于 {formatTime(entry.time)}</Typography.Text>{" "}
         <br />
         {isPending ? (
           <Typography.Text type="secondary">
-            Scheduled, waiting.
+            已安排，等待中。
           </Typography.Text>
         ) : (
           <Typography.Text type="secondary">
-            Took {formatDuration(entry.durationMs)}, added{" "}
+            用时 {formatDuration(entry.durationMs)}, 已添加{" "}
             {formatBytes(entry.bytesAdded)}
           </Typography.Text>
         )}
@@ -209,22 +209,22 @@ const SummaryPanel = ({
   cardInfo.push(
     {
       key: 1,
-      label: "Backups (30d)",
+      label: "备份 (30d)",
       children: (
         <>
           {summary.backupsSuccessLast30days ? (
             <Typography.Text type="success" style={{ marginRight: "5px" }}>
-              {summary.backupsSuccessLast30days + ""} ok
+              {summary.backupsSuccessLast30days + ""} 成功
             </Typography.Text>
           ) : undefined}
           {summary.backupsFailed30days ? (
             <Typography.Text type="danger" style={{ marginRight: "5px" }}>
-              {summary.backupsFailed30days + ""} failed
+              {summary.backupsFailed30days + ""} 失败
             </Typography.Text>
           ) : undefined}
           {summary.backupsWarningLast30days ? (
             <Typography.Text type="warning" style={{ marginRight: "5px" }}>
-              {summary.backupsWarningLast30days + ""} warning
+              {summary.backupsWarningLast30days + ""} 警告
             </Typography.Text>
           ) : undefined}
         </>
@@ -232,12 +232,12 @@ const SummaryPanel = ({
     },
     {
       key: 2,
-      label: "Bytes Scanned (30d)",
+      label: "已扫描大小 (30d)",
       children: formatBytes(Number(summary.bytesScannedLast30days)),
     },
     {
       key: 3,
-      label: "Bytes Added (30d)",
+      label: "已添加大小 (30d)",
       children: formatBytes(Number(summary.bytesAddedLast30days)),
     }
   );
@@ -247,19 +247,19 @@ const SummaryPanel = ({
     cardInfo.push(
       {
         key: 4,
-        label: "Next Scheduled Backup",
+        label: "下次备份",
         children: summary.nextBackupTimeMs
           ? formatTime(Number(summary.nextBackupTimeMs))
-          : "None Scheduled",
+          : "无安排",
       },
       {
         key: 5,
-        label: "Bytes Scanned Avg",
+        label: "平均扫描大小",
         children: formatBytes(Number(summary.bytesScannedAvg)),
       },
       {
         key: 6,
-        label: "Bytes Added Avg",
+        label: "平均添加大小",
         children: formatBytes(Number(summary.bytesAddedAvg)),
       }
     );

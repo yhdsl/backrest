@@ -24,12 +24,12 @@ export const LoginModal = () => {
     try {
       const loginResponse = await authenticationService.login(loginReq);
       setAuthToken(loginResponse.token);
-      alertApi.success("Logged in", 5);
+      alertApi.success("已登录", 5);
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (e: any) {
-      alertApi.error("Login failed: " + (e.message ? e.message : "" + e), 10);
+      alertApi.error("登录失败: " + (e.message ? e.message : "" + e), 10);
     }
   };
 
@@ -37,7 +37,7 @@ export const LoginModal = () => {
     <Modal
       open={true}
       width="40vw"
-      title="Login"
+      title="登录"
       footer={null}
       closable={false}
     >
@@ -53,14 +53,14 @@ export const LoginModal = () => {
             <Form.Item
               name="username"
               rules={[
-                { required: true, message: "Please input your username" },
+                { required: true, message: "请输入用户名" },
               ]}
               style={{ width: "100%", paddingRight: "10px" }}
               initialValue={defaultCreds.username}
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder="用户名"
               />
             </Form.Item>
           </Col>
@@ -69,7 +69,7 @@ export const LoginModal = () => {
             <Form.Item
               name="password"
               rules={[
-                { required: true, message: "Please input your password!" },
+                { required: true, message: "请输入密码！" },
               ]}
               style={{ width: "100%", paddingRight: "10px" }}
               initialValue={defaultCreds.password}
@@ -77,13 +77,13 @@ export const LoginModal = () => {
               <Input
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
-                placeholder="Password"
+                placeholder="密码"
               />
             </Form.Item>
           </Col>
           <Col span={4}>
             <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-              Log in
+              登录
             </Button>
           </Col>
         </Row>

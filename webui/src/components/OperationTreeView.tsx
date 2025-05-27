@@ -106,7 +106,7 @@ export const OperationTreeView = ({
     });
 
     return syncStateFromRequest(logState, req, (err) => {
-      alertApi!.error("API error: " + err.message);
+      alertApi!.error("API 错误: " + err.message);
     });
   }, [toJsonString(GetOperationsRequestSchema, req)]);
 
@@ -265,7 +265,7 @@ const DisplayOperationTree = ({
           );
         }
         return (
-          <span>ERROR: this element should not appear, this is a bug.</span>
+          <span>错误: 此元素不应当出现，请报告这个BUG</span>
         );
       }}
     />
@@ -286,8 +286,8 @@ const buildTree = (
       let title: React.ReactNode = key;
       if (title === "_unassociated_") {
         title = (
-          <Tooltip title="_unassociated_ instance ID collects operations that do not specify a `created-by:` tag denoting the backrest install that created them.">
-            _unassociated_
+          <Tooltip title="“_未关联_” 实例ID表明操作未包含 `created-by:` 标签，该标签用于记录创建它们的 backrest 实例。">
+            _未关联_
           </Tooltip>
         );
       }
@@ -310,14 +310,14 @@ const buildTree = (
       let title: React.ReactNode = value[0].planID;
       if (title === "_unassociated_") {
         title = (
-          <Tooltip title="_unassociated_ plan ID collects operations that do not specify a `plan:` tag denoting the backup plan that created them.">
-            _unassociated_
+          <Tooltip title="“_未关联_” 调度计划ID表明操作未包含 `plan:` 标签，该标签用于记录创建它们的备份调度计划。">
+            _未关联_
           </Tooltip>
         );
       } else if (title === "_system_") {
         title = (
-          <Tooltip title="_system_ plan ID collects health operations not associated with any single plan e.g. repo level check or prune runs.">
-            _system_
+          <Tooltip title="“_系统_” 调度计划ID表明操作与单一调度计划无关，而是储存库等级的检查(check)操作或修剪(prune)等操作。">
+            _系统_
           </Tooltip>
         );
       }
@@ -533,7 +533,7 @@ const BackupViewContainer = ({ children }: { children: React.ReactNode }) => {
 const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
   const alertApi = useAlertApi();
   if (!backup) {
-    return <Empty description="Backup not found." />;
+    return <Empty description="未找到备份。" />;
   } else {
     const doDeleteSnapshot = async () => {
       try {
@@ -544,9 +544,9 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
             snapshotId: backup.snapshotID!,
           })
         );
-        alertApi!.success("Snapshot forgotten.");
+        alertApi!.success("已忘记快照。");
       } catch (e) {
-        alertApi!.error("Failed to forget snapshot: " + e);
+        alertApi!.error("忘记快照时出错: " + e);
       }
     };
 
@@ -556,20 +556,20 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
 
     const deleteButton =
       snapshotInFlow && snapshotInFlow.snapshotId ? (
-        <Tooltip title="This will remove the snapshot from the repository. This is irreversible.">
+        <Tooltip title="这将从储存库中删除快照，该操作不可逆！">
           <ConfirmButton
             type="text"
-            confirmTitle="Confirm forget?"
+            confirmTitle="确认忘记？"
             confirmTimeout={2000}
             onClickAsync={doDeleteSnapshot}
           >
-            Forget (Destructive)
+            忘记 (危险)
           </ConfirmButton>
         </Tooltip>
       ) : (
         <ConfirmButton
           type="text"
-          confirmTitle="Confirm clear?"
+          confirmTitle="确认清除？"
           onClickAsync={async () => {
             backrestService.clearHistory(
               create(ClearHistoryRequestSchema, {
@@ -580,7 +580,7 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
             );
           }}
         >
-          Delete Event
+          删除事件
         </ConfirmButton>
       );
 

@@ -74,8 +74,8 @@ export const LogView = ({ logref }: { logref: string }) => {
             type="link"
             onClick={() => setLimit(limit * 10)}
           >
-            Show {Math.min(limit * 9, lines.length - limit)} more lines out of{" "}
-            {lines.length} available...
+            显示另外 {Math.min(limit * 9, lines.length - limit)} 行日志，共{" "}
+            {lines.length} 行日志可用...
           </Button>
         </>
       ) : null}

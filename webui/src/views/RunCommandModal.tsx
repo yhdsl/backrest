@@ -48,7 +48,7 @@ export const RunCommandModal = ({ repo }: { repo: Repo }) => {
         })
       );
     } catch (e: any) {
-      alertApi.error("Command failed: " + e.message);
+      alertApi.error("命令失败: " + e.message);
     } finally {
       setRunning(false);
     }
@@ -58,13 +58,13 @@ export const RunCommandModal = ({ repo }: { repo: Repo }) => {
     <Modal
       open={true}
       onCancel={handleCancel}
-      title={"Run Command in repo " + repo.id}
+      title={"在储存库 " + repo.id + " 上运行命令"}
       width="80vw"
       footer={[]}
     >
       <Space.Compact style={{ width: "100%" }}>
         <Input
-          placeholder="Run a restic command e.g. 'help' to print help text"
+          placeholder="运行 restic 命令，例如执行 help 打印帮助文本"
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           onKeyUp={(e) => {
@@ -74,13 +74,12 @@ export const RunCommandModal = ({ repo }: { repo: Repo }) => {
           }}
         />
         <SpinButton type="primary" onClickAsync={doExecute}>
-          Execute
+          执行
         </SpinButton>
       </Space.Compact>
       {running && command ? (
         <em style={{ color: "gray" }}>
-          Warning: another command is already running. Wait for it to finish
-          before running another operation that requires the repo lock.
+          警告：已在运行另一个命令。请等待该命令完成后再执行其它需要处理储存库锁定文件的命令。
         </em>
       ) : null}
       <OperationListView

@@ -288,7 +288,7 @@ const RestoreModal = ({
         })
       );
     } catch (e: any) {
-      alert("Failed to restore snapshot: " + e.message);
+      alert("恢复操作时出错: " + e.message);
     } finally {
       showModal(null); // close.
     }
@@ -317,7 +317,7 @@ const RestoreModal = ({
               {
                 name: "target",
                 errors: [
-                  "target path already exists, you must pick an empty path.",
+                  "目标路径不为空，你必须选择一个空文件夹。",
                 ],
               },
             ]);
@@ -347,20 +347,20 @@ const RestoreModal = ({
       open={true}
       onCancel={handleCancel}
       title={
-        "Restore " + path + " from snapshot " + normalizeSnapshotId(snapshotId)
+        "从快照 " + normalizeSnapshotId(snapshotId) + " 中恢复 " + path
       }
       width="40vw"
       footer={[
         <Button key="back" onClick={handleCancel}>
-          Cancel
+          取消
         </Button>,
         <ConfirmButton
           key="submit"
           type="primary"
-          confirmTitle="Confirm Restore?"
+          confirmTitle="确认恢复？"
           onClickAsync={handleOk}
         >
-          Restore
+          恢复
         </ConfirmButton>,
       ]}
     >
@@ -371,17 +371,15 @@ const RestoreModal = ({
         wrapperCol={{ span: 16 }}
       >
         <p>
-          If restoring to a specific path, ensure that the path does not already
-          exist or that you are comfortable overwriting the data at that
-          location.
+          如果选择恢复至指定的路径，请确保路径为空或不存在，
+          除非确认需要覆盖原先存在的文件。
         </p>
         <p>
-          You may set the path to an empty string to restore to your Downloads
-          folder.
+          路径留空以使用浏览器默认的下载文件夹。
         </p>
-        <Form.Item label="Restore to path" name="target" rules={[]}>
+        <Form.Item label="恢复至" name="target" rules={[]}>
           <URIAutocomplete
-            placeholder="Restoring to Downloads"
+            placeholder="浏览器下载文件夹"
             defaultValue={defaultPath}
           />
         </Form.Item>

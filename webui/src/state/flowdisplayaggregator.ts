@@ -61,11 +61,11 @@ export const displayInfoForFlow = (ops: Operation[]): FlowDisplayInfo => {
             const percentage = lastStatus.entry.value.percentDone * 100;
             const bytesDone = formatBytes(Number(lastStatus.entry.value.bytesDone));
             const totalBytes = formatBytes(Number(lastStatus.entry.value.totalBytes));
-            info.subtitleComponents.push(`${percentage.toFixed(2)}% processed`);
+            info.subtitleComponents.push(`已处理 ${percentage.toFixed(2)}%`);
             info.subtitleComponents.push(`${bytesDone}/${totalBytes}`);
           } else if (lastStatus.entry.case === "summary") {
             const totalBytes = formatBytes(Number(lastStatus.entry.value.totalBytesProcessed));
-            info.subtitleComponents.push(`${totalBytes} in ${formatDuration(duration)}`);
+            info.subtitleComponents.push(`${totalBytes} 共计 ${formatDuration(duration)}`);
             info.subtitleComponents.push(`ID: ${normalizeSnapshotId(lastStatus.entry.value.snapshotId)}`);
           }
         }
@@ -77,12 +77,12 @@ export const displayInfoForFlow = (ops: Operation[]): FlowDisplayInfo => {
         if (lastStatus) {
           if (lastStatus.messageType === "summary") {
             const totalBytes = formatBytes(Number(lastStatus.totalBytes));
-            info.subtitleComponents.push(`${totalBytes} in ${formatDuration(duration)}`);
+            info.subtitleComponents.push(`${totalBytes} 共计 ${formatDuration(duration)}`);
           } else if (lastStatus.messageType === "status") {
             const percentage = lastStatus.percentDone * 100;
             const bytesDone = formatBytes(Number(lastStatus.bytesRestored));
             const totalBytes = formatBytes(Number(lastStatus.totalBytes));
-            info.subtitleComponents.push(`${percentage.toFixed(2)}% processed`);
+            info.subtitleComponents.push(`已处理 ${percentage.toFixed(2)}%`);
             info.subtitleComponents.push(`${bytesDone}/${totalBytes}`);
           }
         }
@@ -93,23 +93,23 @@ export const displayInfoForFlow = (ops: Operation[]): FlowDisplayInfo => {
       const snapshot = firstOp.op.value.snapshot;
       if (!snapshot) break;
       if (snapshot.summary && snapshot.summary.totalBytesProcessed) {
-        info.subtitleComponents.push(`${formatBytes(Number(snapshot.summary.totalBytesProcessed))} in ${formatDuration(snapshot.summary.totalDuration * 1000)}`);
+        info.subtitleComponents.push(`${formatBytes(Number(snapshot.summary.totalBytesProcessed))} 共计 ${formatDuration(snapshot.summary.totalDuration * 1000)}`);
       }
       info.subtitleComponents.push(`ID: ${normalizeSnapshotId(snapshot.id)}`);
     default:
       switch (firstOp.status) {
         case OperationStatus.STATUS_INPROGRESS:
-          info.subtitleComponents.push("running");
+          info.subtitleComponents.push("运行中");
           break;
         case OperationStatus.STATUS_USER_CANCELLED:
-          info.subtitleComponents.push("cancelled by user");
+          info.subtitleComponents.push("由用户取消");
           break;
         case OperationStatus.STATUS_SYSTEM_CANCELLED:
-          info.subtitleComponents.push("cancelled by system");
+          info.subtitleComponents.push("由系统取消");
           break;
         default:
           if (duration > 100) {
-            info.subtitleComponents.push(`took ${formatDuration(duration)}`);
+            info.subtitleComponents.push(`用时 ${formatDuration(duration)}`);
           }
           break;
       }

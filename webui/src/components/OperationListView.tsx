@@ -44,14 +44,14 @@ export const OperationListView = ({
       });
 
       return syncStateFromRequest(logState, req, (e) => {
-        alertApi!.error("Failed to fetch operations: " + e.message);
+        alertApi!.error("获取操作时出错: " + e.message);
       });
     }, [toJsonString(GetOperationsRequestSchema, req)]);
   }
   if (!operations) {
     return (
       <Empty
-        description="No operations yet."
+        description="尚未存在任何操作。"
         image={Empty.PRESENTED_IMAGE_SIMPLE}
       ></Empty>
     );

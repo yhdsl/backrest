@@ -17,16 +17,16 @@ const subscribers: ((event?: OperationEvent, err?: Error) => void)[] = [];
     let nextConnWaitUntil = new Date().getTime() + 5000;
     try {
       for await (const event of backrestService.getOperationEvents({})) {
-        console.log("operation event", event);
+        console.log("操作事件", event);
         subscribers.forEach((subscriber) => subscriber(event, undefined));
       }
     } catch (e: any) {
-      console.error("operations stream died with exception: ", e);
+      console.error("操作流由于异常而中止: ", e);
     }
     await new Promise((accept, _) =>
       setTimeout(accept, nextConnWaitUntil - new Date().getTime()),
     );
-    subscribers.forEach((subscriber) => subscriber(undefined, new Error("reconnecting")));
+    subscribers.forEach((subscriber) => subscriber(undefined, new Error("重新连接")));
   }
 })();
 
@@ -41,7 +41,7 @@ export const subscribeToOperations = (
   callback: (event?: OperationEvent, err?: Error) => void,
 ) => {
   subscribers.push(callback);
-  console.log("subscribed to operations, subscriber count: ", subscribers.length);
+  console.log("已订阅操作，总订阅数: ", subscribers.length);
 };
 
 export const unsubscribeFromOperations = (
@@ -52,7 +52,7 @@ export const unsubscribeFromOperations = (
     subscribers[index] = subscribers[subscribers.length - 1];
     subscribers.pop();
   }
-  console.log("unsubscribed from operations, subscriber count: ", subscribers.length);
+  console.log("已取消订阅操作，总订阅数: ", subscribers.length);
 };
 
 

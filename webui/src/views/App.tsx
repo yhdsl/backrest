@@ -72,13 +72,13 @@ const RepoViewContainer = () => {
 
   return (
     <MainContentAreaTemplate
-      breadcrumbs={[{ title: "Repo" }, { title: repoId! }]}
+      breadcrumbs={[{ title: "储存库" }, { title: repoId! }]}
       key={repoId}
     >
       {repo ? (
         <RepoView repo={repo} />
       ) : (
-        <Empty description={`Repo ${repoId} not found`} />
+        <Empty description={`储存库 ${repoId} 未找到`} />
       )}
     </MainContentAreaTemplate>
   );
@@ -95,13 +95,13 @@ const PlanViewContainer = () => {
   const plan = config.plans.find((p) => p.id === planId);
   return (
     <MainContentAreaTemplate
-      breadcrumbs={[{ title: "Plan" }, { title: planId! }]}
+      breadcrumbs={[{ title: "调度计划" }, { title: planId! }]}
       key={planId}
     >
       {plan ? (
         <PlanView plan={plan} />
       ) : (
-        <Empty description={`Plan ${planId} not found`} />
+        <Empty description={`调度计划 ${planId} 未找到`} />
       )}
     </MainContentAreaTemplate>
   );
@@ -171,7 +171,7 @@ export const App: React.FC = () => {
               window.location.reload();
             }}
           >
-            Logout
+            登出
           </Button>
         </h1>
       </Header>
@@ -200,7 +200,7 @@ export const App: React.FC = () => {
                 path="/getting-started"
                 element={
                   <MainContentAreaTemplate
-                    breadcrumbs={[{ title: "Getting Started" }]}
+                    breadcrumbs={[{ title: "快速入门" }]}
                   >
                     <GettingStartedGuide />
                   </MainContentAreaTemplate>
@@ -212,7 +212,7 @@ export const App: React.FC = () => {
                 path="/*"
                 element={
                   <MainContentAreaTemplate breadcrumbs={[]}>
-                    <Empty description="Page not found" />
+                    <Empty description="页面未找到" />
                   </MainContentAreaTemplate>
                 }
               />
@@ -260,7 +260,7 @@ const AuthenticationBoundary = ({
         }
 
         alertApi.error(
-          "Failed to fetch initial config, typically this means the UI could not connect to the backend",
+          "获取初始配置时出错，通常这表明无法连接至后端服务器",
           0
         );
       });
@@ -289,7 +289,7 @@ const getSidenavItems = (config: Config | null): MenuProps["items"] => {
     {
       key: "add-plan",
       icon: <PlusOutlined />,
-      label: "Add Plan",
+      label: "添加调度计划",
       onClick: async () => {
         const { AddPlanModal } = await import("./AddPlanModal");
         showModal(<AddPlanModal template={null} />);
@@ -336,7 +336,7 @@ const getSidenavItems = (config: Config | null): MenuProps["items"] => {
     {
       key: "add-repo",
       icon: <PlusOutlined />,
-      label: "Add Repo",
+      label: "添加储存库",
       onClick: async () => {
         const { AddRepoModal } = await import("./AddRepoModal");
         showModal(<AddRepoModal template={null} />);
@@ -384,19 +384,19 @@ const getSidenavItems = (config: Config | null): MenuProps["items"] => {
     {
       key: "plans",
       icon: React.createElement(ScheduleOutlined),
-      label: "Plans",
+      label: "调度计划",
       children: plans,
     },
     {
       key: "repos",
       icon: React.createElement(DatabaseOutlined),
-      label: "Repositories",
+      label: "储存库",
       children: repos,
     },
     {
       key: "settings",
       icon: React.createElement(SettingOutlined),
-      label: "Settings",
+      label: "设置",
       onClick: async () => {
         const { SettingsModal } = await import("./SettingsModal");
         showModal(<SettingsModal />);

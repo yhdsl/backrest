@@ -34,22 +34,22 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
         })
       );
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Failed to index snapshots: "));
+      alertsApi.error(formatErrorAlert(e, "索引快照时出错: "));
     }
   };
 
   const handleUnlockNow = async () => {
     try {
-      alertsApi.info("Unlocking repo...");
+      alertsApi.info("解锁储存库中...");
       await backrestService.doRepoTask(
         create(DoRepoTaskRequestSchema, {
           repoId: repo.id!,
           task: DoRepoTaskRequest_Task.UNLOCK,
         })
       );
-      alertsApi.success("Repo unlocked.");
+      alertsApi.success("已解锁储存库");
     } catch (e: any) {
-      alertsApi.error("Failed to unlock repo: " + e.message);
+      alertsApi.error("解锁储存库时出错: " + e.message);
     }
   };
 
@@ -62,7 +62,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
         })
       );
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Failed to compute stats: "));
+      alertsApi.error(formatErrorAlert(e, "计算统计信息时出错: "));
     }
   };
 
@@ -75,7 +75,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
         })
       );
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Failed to prune: "));
+      alertsApi.error(formatErrorAlert(e, "修剪时出错: "));
     }
   };
 
@@ -88,7 +88,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
         })
       );
     } catch (e: any) {
-      alertsApi.error(formatErrorAlert(e, "Failed to check: "));
+      alertsApi.error(formatErrorAlert(e, "检查时出错: "));
     }
   };
 
@@ -97,7 +97,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
   if (!repoInConfig) {
     return (
       <>
-        Repo was deleted
+        已删除储存库
         <pre>{JSON.stringify(config, null, 2)}</pre>
       </>
     );
@@ -107,7 +107,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
   const items = [
     {
       key: "1",
-      label: "Tree View",
+      label: "树形视图",
       children: (
         <>
           <OperationTreeView
@@ -124,10 +124,10 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
     },
     {
       key: "2",
-      label: "List View",
+      label: "列表视图",
       children: (
         <>
-          <h3>Backup Action History</h3>
+          <h3>备份活动记录</h3>
           <OperationListView
             req={create(GetOperationsRequestSchema, {
               selector: {
@@ -144,9 +144,9 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
     },
     {
       key: "3",
-      label: "Stats",
+      label: "统计信息",
       children: (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>加载中...</div>}>
           <StatsPanel
             selector={create(OpSelectorSchema, {
               repoGuid: repo.guid,
@@ -164,7 +164,7 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
         <Typography.Title>{repo.id}</Typography.Title>
       </Flex>
       <Flex gap="small" align="center" wrap="wrap">
-        <Tooltip title="Advanced users: open a restic shell to run commands on the repository. Re-index snapshots to reflect any changes in Backrest.">
+        <Tooltip title="仅高级用户：在储存库中执行任意 Restic 命令。随后重新索引快照并在 Backrest 中显示可能的更改。">
           <Button
             type="default"
             onClick={async () => {
@@ -172,37 +172,37 @@ export const RepoView = ({ repo }: React.PropsWithChildren<{ repo: Repo }>) => {
               showModal(<RunCommandModal repo={repo} />);
             }}
           >
-            Run Command
+            运行命令
           </Button>
         </Tooltip>
 
-        <Tooltip title="Indexes the snapshots in the repository. Snapshots are also indexed automatically after each backup.">
+        <Tooltip title="索引储存库中的快照。每次备份操作后也会自动索引快照。">
           <SpinButton type="default" onClickAsync={handleIndexNow}>
-            Index Snapshots
+            索引快照
           </SpinButton>
         </Tooltip>
 
-        <Tooltip title="Removes lockfiles and checks the repository for errors. Only run if you are sure the repo is not being accessed by another system">
+        <Tooltip title="删除锁锁定文件并检查储存库是否存在错误。仅当在确定储存库未被其他系统访问时运行。">
           <SpinButton type="default" onClickAsync={handleUnlockNow}>
-            Unlock Repo
+            解锁储存库
           </SpinButton>
         </Tooltip>
 
-        <Tooltip title="Runs a prune operation on the repository that will remove old snapshots and free up space">
+        <Tooltip title="对储存库运行修剪(prune)操作，以删除旧快照并释放空间">
           <SpinButton type="default" onClickAsync={handlePruneNow}>
-            Prune Now
+            立即修剪
           </SpinButton>
         </Tooltip>
 
-        <Tooltip title="Runs a check operation on the repository that will verify the integrity of the repository">
+        <Tooltip title="对储存库运行检查(check)操作，以验证储存库的完整性">
           <SpinButton type="default" onClickAsync={handleCheckNow}>
-            Check Now
+            立即检查
           </SpinButton>
         </Tooltip>
 
-        <Tooltip title="Runs restic stats on the repository, this may be a slow operation">
+        <Tooltip title="计算储存库的统计信息，这可能会花费大量的时间">
           <SpinButton type="default" onClickAsync={handleStatsNow}>
-            Compute Stats
+            计算统计信息
           </SpinButton>
         </Tooltip>
       </Flex>

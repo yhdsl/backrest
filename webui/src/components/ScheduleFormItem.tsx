@@ -100,7 +100,7 @@ export const ScheduleFormItem = ({
         rules={[
           {
             required: true,
-            message: "Please provide a valid cron schedule.",
+            message: "请提供一个有效的 cron 调度计划",
           },
         ]}
       >
@@ -124,12 +124,12 @@ export const ScheduleFormItem = ({
         rules={[
           {
             required: true,
-            message: "Please input an interval in days",
+            message: "请输入间隔天数",
           },
         ]}
       >
         <InputNumber
-          addonBefore={<div style={{ width: "10em" }}>Interval in Days</div>}
+          addonBefore={<div style={{ width: "10em" }}>间隔天数</div>}
           type="number"
           min={1}
         />
@@ -144,12 +144,12 @@ export const ScheduleFormItem = ({
         rules={[
           {
             required: true,
-            message: "Please input an interval in hours",
+            message: "请输入间隔小时数",
           },
         ]}
       >
         <InputNumber
-          addonBefore={<div style={{ width: "10em" }}>Interval in Hours</div>}
+          addonBefore={<div style={{ width: "10em" }}>间隔小时数</div>}
           type="number"
           min={1}
         />
@@ -197,41 +197,37 @@ export const ScheduleFormItem = ({
           }}
         >
           <Radio.Button value={"disabled"}>
-            <Tooltip title="Schedule is disabled, will never run.">
-              Disabled
+            <Tooltip title="调度计划将被禁用，不会运行">
+              禁用
             </Tooltip>
           </Radio.Button>
           <Radio.Button value={"maxFrequencyHours"}>
-            <Tooltip title="Schedule will run at the specified interval in hours.">
-              Interval Hours
+            <Tooltip title="调度计划将根据设定的小时数间隔运行">
+              按小时运行
             </Tooltip>
           </Radio.Button>
           <Radio.Button value={"maxFrequencyDays"}>
-            <Tooltip title="Schedule will run at the specified interval in days.">
-              Interval Days
+            <Tooltip title="调度计划将根据设定的天数间隔运行">
+              按天运行
             </Tooltip>
           </Radio.Button>
           <Radio.Button value={"cron"}>
-            <Tooltip title="Schedule will run based on a cron schedule.">
+            <Tooltip title="调度计划将根据设定的 Cron 计划运行">
               Cron
             </Tooltip>
           </Radio.Button>
         </Radio.Group>
         <Typography.Text style={{ marginLeft: "1em", marginRight: "1em" }}>
-          Clock for schedule:{" "}
+          调度计划时钟:{" "}
         </Typography.Text>
         <Tooltip
           title={
             <>
-              Clock provides the time that the schedule is evaluated relative
-              to.
+              时钟用于为调度计划评估间隔时长提供支持
               <ul>
-                <li>Local - current time in the local timezone.</li>
-                <li>UTC - current time in the UTC timezone.</li>
-                <li>
-                  Last Run Time - relative to the last time the task ran. Good
-                  for devices that aren't always powered on e.g. laptops.
-                </li>
+                <li>本地时钟 - 当地时区的当前时间</li>
+                <li>UTC时钟 - UTC时区的当前时间</li>
+                <li>上次运行时间 - 相对于上次运行的时间间隔，适用于不常开机的设备，例如笔记本电脑</li>
               </ul>
             </>
           }
@@ -241,15 +237,15 @@ export const ScheduleFormItem = ({
               <Radio.Button
                 value={clockEnumValueToString(Schedule_Clock.LOCAL)}
               >
-                Local
+                本地时钟
               </Radio.Button>
               <Radio.Button value={clockEnumValueToString(Schedule_Clock.UTC)}>
-                UTC
+                UTC时钟
               </Radio.Button>
               <Radio.Button
                 value={clockEnumValueToString(Schedule_Clock.LAST_RUN_TIME)}
               >
-                Last Run Time
+                上次运行时间
               </Radio.Button>
             </Radio.Group>
           </Form.Item>
