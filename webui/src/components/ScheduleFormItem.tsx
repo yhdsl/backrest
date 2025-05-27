@@ -8,7 +8,7 @@ import {
   Typography,
 } from "antd";
 import React from "react";
-import Cron, { CronType, PeriodType } from "react-js-cron";
+import Cron, { CronType, PeriodType, DefaultLocale } from "react-js-cron";
 import {
   Schedule_Clock,
   Schedule_ClockSchema,
@@ -91,6 +91,87 @@ export const ScheduleFormItem = ({
   const mode = determineMode();
 
   let elem: React.ReactNode = null;
+
+  const DEFAULT_LOCALE_ZH_CN: DefaultLocale = {
+    everyText: '每',
+    emptyMonths: '每月',
+    emptyMonthDays: '每天',
+    emptyMonthDaysShort: '每天',
+    emptyWeekDays: '每天',
+    emptyWeekDaysShort: '每天',
+    emptyHours: '每小时',
+    emptyMinutes: '每分钟',
+    emptyMinutesForHourPeriod: '每',
+    yearOption: '年',
+    monthOption: '月',
+    weekOption: '周',
+    dayOption: '天',
+    hourOption: '小时',
+    minuteOption: '分钟',
+    rebootOption: '重启',
+    prefixPeriod: '每',
+    prefixMonths: '在',
+    prefixMonthDays: '的',
+    prefixWeekDays: '的',
+    prefixWeekDaysForMonthAndYearPeriod: '和',
+    prefixHours: '的',
+    prefixMinutes: ':',
+    prefixMinutesForHourPeriod: '的',
+    suffixMinutesForHourPeriod: '分钟',
+    errorInvalidCron: '无效的 cron 表达式',
+    clearButtonText: '清除',
+    weekDays: [
+      // Order is important, the index will be used as value
+      '周日', // Sunday must always be first, it's "0"
+      '周一',
+      '周二',
+      '周三',
+      '周四',
+      '周五',
+      '周六',
+    ],
+    months: [
+      // Order is important, the index will be used as value
+      '一月',
+      '二月',
+      '三月',
+      '四月',
+      '五月',
+      '六月',
+      '七月',
+      '八月',
+      '九月',
+      '十月',
+      '十一月',
+      '十二月',
+    ],
+    // Order is important, the index will be used as value
+    altWeekDays: [
+      '周日', // Sunday must always be first, it's "0"
+      '周一',
+      '周二',
+      '周三',
+      '周四',
+      '周五',
+      '周六',
+    ],
+    // Order is important, the index will be used as value
+    altMonths: [
+      '一月',
+      '二月',
+      '三月',
+      '四月',
+      '五月',
+      '六月',
+      '七月',
+      '八月',
+      '九月',
+      '十月',
+      '十一月',
+      '十二月',
+    ],
+  }
+
   if (mode === "cron") {
     elem = (
       <Form.Item
@@ -112,6 +193,7 @@ export const ScheduleFormItem = ({
           allowedDropdowns={defaults.cronDropdowns}
           allowedPeriods={defaults.cronPeriods}
           clearButton={false}
+          locale={DEFAULT_LOCALE_ZH_CN}
         />
       </Form.Item>
     );
