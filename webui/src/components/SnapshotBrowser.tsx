@@ -37,12 +37,7 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    if (a.title && b.title) {
-      return collator.compare(a.title.toString(), b.title.toString());
-    }
-    else {
-      return 0;
-    }
+    return collator.compare(a.title.toString(), b.title.toString());
   }
 }
 
