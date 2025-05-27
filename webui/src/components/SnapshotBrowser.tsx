@@ -25,9 +25,7 @@ import { StringValueSchema } from "../../gen/ts/types/value_pb";
 import { pathSeparator } from "../state/buildcfg";
 import { create, toJsonString } from "@bufbuild/protobuf";
 
-const collator = new Intl.Collator(undefined,
-    {numeric: true, sensitivity: 'base', collation: 'pinyin', caseFirst: 'lower'}
-);
+const collator = new Intl.Collator("en", {numeric: true, caseFirst: 'lower'});
 
 function compareFn(a: DataNode, b: DataNode) {
   if (a.isLeaf === true && b.isLeaf === false) {
@@ -37,18 +35,7 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    let a_code = a.key.toString().toLowerCase().charCodeAt(1);
-    let a_is_cjk = 97 <= a_code && a_code <= 122;
-    let b_code = b.key.toString().toLowerCase().charCodeAt(1);
-    let b_is_cjk = 97 <= b_code && b_code <= 122;
-
-    let compare = collator.compare(a.key.toString(), b.key.toString());
-    if (a_is_cjk != b_is_cjk) {
-      return -1 * compare;
-    }
-    else {
-      return compare;
-    }
+    return collator.compare(a.key.toString(), b.key.toString());
   }
 }
 
