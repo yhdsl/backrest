@@ -200,6 +200,7 @@ const FileNode = ({ entry }: { entry: LsEntry }) => {
   const showDropdown = () => {
     setDropdown(
       <Dropdown
+        trigger={['click']}
         menu={{
           items: [
             {
@@ -240,13 +241,15 @@ const FileNode = ({ entry }: { entry: LsEntry }) => {
           ],
         }}
       >
-        <DownloadOutlined />
+        <a onClick={(e) => e.preventDefault()}>
+          <DownloadOutlined />
+        </a>
       </Dropdown>
     );
   };
 
   return (
-    <Space onMouseEnter={showDropdown}>
+    <Space onMouseEnter={showDropdown} onMouseLeave={() => setDropdown(null)}>
       {entry.name}
       {entry.type === "file" ? (
         <span className="backrest file-details">
