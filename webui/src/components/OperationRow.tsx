@@ -344,7 +344,7 @@ export const OperationRow = ({
               )}
               <Collapse
                 size="small"
-                destroyInactivePanel={true}
+                destroyOnHidden={true}
                 items={bodyItems}
                 defaultActiveKey={expandedBodyItems}
               />
@@ -605,7 +605,9 @@ const ForgetOperationDetails = ({
         policyDesc.push(`最近的 ${val.yearly} 年，每年保留一个快照`);
       }
       if (val.keepLastN) {
-        policyDesc.push(`保留最新的 ${val.keepLastN} 个快照，无视时间情况`);
+        policyDesc.push(
+          `保留最新的 ${val.keepLastN} 个快照，无视时间情况`
+        );
       }
     }
   }

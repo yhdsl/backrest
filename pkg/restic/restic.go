@@ -12,10 +12,12 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/djherbis/buffer"
 	nio "github.com/djherbis/nio/v3"
 	"github.com/garethgeorge/backrest/internal/ioutil"
+	"go.uber.org/zap"
 )
 
 var errAlreadyInitialized = errors.New("repo already initialized")
@@ -113,12 +115,33 @@ func (r *Repo) executeWithJSONOutput(ctx context.Context, args []string, result 
 		return err
 	}
 
-	if err := json.Unmarshal(output, result); err != nil {
-		return newCmdError(ctx, r.commandWithContext(ctx, args),
-			newErrorWithOutput(fmt.Errorf("command output is not valid JSON: %w", err), string(output)))
+	// Try to parse the entire output first
+	origErr := json.Unmarshal(output, result)
+	if origErr == nil {
+		return nil
 	}
 
-	return nil
+	// Find the index afterwhich everything is whitespace
+	allWhitespaceAfterIdx := len(output)
+	for i, b := range output {
+		if unicode.IsSpace(rune(b)) {
+			allWhitespaceAfterIdx = i
+		}
+	}
+
+	// If that fails, try by skipping bytes until a newline is found
+	start := 0
+	for start < allWhitespaceAfterIdx {
+		if err := json.Unmarshal(output[start:], result); err == nil {
+			zap.S().Warnf("Command %v output may have contained a skipped warning from restic that was not valid JSON: %s", args, string(output[start:]))
+			return nil
+		}
+		start = start + bytes.IndexRune(output[start:], '\n')
+		start++ // skip the newline itself
+	}
+
+	return newCmdError(ctx, r.commandWithContext(ctx, args),
+		newErrorWithOutput(fmt.Errorf("command output is not valid JSON: %w", err), string(output)))
 }
 
 // Exists checks if the repository exists.
