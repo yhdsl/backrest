@@ -34,7 +34,6 @@ type SyncClient struct {
 	reconnectDelay     time.Duration
 	l                  *zap.Logger
 
-	peerState         *PeerState
 	reconnectAttempts int
 }
 
@@ -74,9 +73,8 @@ func NewSyncClient(
 		client:             client,
 		oplog:              oplog,
 		l:                  zap.L().Named(fmt.Sprintf("syncclient for %q", peer.GetInstanceId())),
-		peerState:          newPeerState(peer.InstanceId, peer.Keyid),
 	}
-	c.mgr.peerStateManager.SetPeerState(peer.Keyid, c.peerState)
+	c.mgr.peerStateManager.SetPeerState(peer.Keyid, newPeerState(peer.InstanceId, peer.Keyid))
 	return c, nil
 }
 
@@ -94,7 +92,6 @@ func (c *SyncClient) RunSync(ctx context.Context) {
 			c.syncConfigSnapshot,
 			c.oplog,
 			c.peer,
-			c.peerState,
 		)
 
 		cmdStream := newBidiSyncCommandStream()
@@ -119,16 +116,19 @@ func (c *SyncClient) RunSync(ctx context.Context) {
 		if err := cmdStream.ConnectStream(ctx, c.client.Sync(ctx)); err != nil {
 			c.l.Sugar().Infof("lost stream connection to peer %q (%s): %v", c.peer.InstanceId, c.peer.Keyid, err)
 			var syncErr *SyncError
-			c.peerState.LastHeartbeat = time.Now()
-			if errors.As(err, &syncErr) {
-				c.peerState.ConnectionState = syncErr.State
-				c.peerState.ConnectionStateMessage = syncErr.Message.Error()
-				c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, c.peerState)
-			} else {
-				c.peerState.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_ERROR_INTERNAL
-				c.peerState.ConnectionStateMessage = err.Error()
-				c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, c.peerState)
+			state := c.mgr.peerStateManager.GetPeerState(c.peer.Keyid).Clone()
+			if state == nil {
+				state = newPeerState(c.peer.InstanceId, c.peer.Keyid)
 			}
+			state.LastHeartbeat = time.Now()
+			if errors.As(err, &syncErr) {
+				state.ConnectionState = syncErr.State
+				state.ConnectionStateMessage = syncErr.Message.Error()
+			} else {
+				state.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_ERROR_INTERNAL
+				state.ConnectionStateMessage = err.Error()
+			}
+			c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, state)
 		} else {
 			c.reconnectAttempts = 0
 		}
@@ -162,8 +162,6 @@ type syncSessionHandlerClient struct {
 
 	peer        *v1.Multihost_Peer // The peer this handler is associated with, unset until OnConnectionEstablished is called.
 	permissions *permissions.PermissionSet
-
-	peerState *PeerState // The state of the peer, used to track connection state and other metadata.
 }
 
 func newSyncHandlerClient(
@@ -172,7 +170,6 @@ func newSyncHandlerClient(
 	snapshot syncConfigSnapshot,
 	oplog *oplog.OpLog,
 	peer *v1.Multihost_Peer, // The peer this handler is associated with, must be set before calling OnConnectionEstablished.
-	peerState *PeerState,
 ) *syncSessionHandlerClient {
 	return &syncSessionHandlerClient{
 		l:                  l,
@@ -181,15 +178,10 @@ func newSyncHandlerClient(
 		localInstanceID:    snapshot.config.Instance,
 		oplog:              oplog,
 		peer:               peer,
-		peerState:          peerState,
 	}
 }
 
 var _ syncSessionHandler = (*syncSessionHandlerClient)(nil)
-
-func (c *syncSessionHandlerClient) notifyPeerStateChanged() {
-	c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, c.peerState)
-}
 
 func (c *syncSessionHandlerClient) canForwardOperation(op *v1.Operation) bool {
 	if op.GetOriginalInstanceKeyid() != "" || op.GetInstanceId() != c.localInstanceID {
@@ -214,13 +206,17 @@ func (c *syncSessionHandlerClient) OnConnectionEstablished(ctx context.Context, 
 	}
 
 	c.l.Sugar().Infof("sync connection established with peer %q (%s)", peer.InstanceId, peer.Keyid)
-	c.peerState.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_CONNECTED
-	c.peerState.ConnectionStateMessage = "connected"
-	c.notifyPeerStateChanged()
+	peerState := c.mgr.peerStateManager.GetPeerState(peer.Keyid).Clone()
+	if peerState == nil {
+		peerState = newPeerState(c.peer.InstanceId, peer.Keyid)
+	}
+	peerState.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_CONNECTED
+	peerState.ConnectionStateMessage = "connected"
+	peerState.LastHeartbeat = time.Now()
+	c.mgr.peerStateManager.SetPeerState(peer.Keyid, peerState)
 
 	// Send a heartbeat every 2 minutes to keep the connection alive.
 	go sendHeartbeats(ctx, stream, env.MultihostHeartbeatInterval())
-	c.peerState.LastHeartbeat = time.Now()
 
 	localConfig := c.syncConfigSnapshot.config
 
@@ -388,8 +384,12 @@ func (c *syncSessionHandlerClient) OnConnectionEstablished(ctx context.Context, 
 }
 
 func (c *syncSessionHandlerClient) HandleHeartbeat(ctx context.Context, stream *bidiSyncCommandStream, item *v1.SyncStreamItem_SyncActionHeartbeat) error {
-	c.peerState.LastHeartbeat = time.Now()
-	c.notifyPeerStateChanged()
+	peerState := c.mgr.peerStateManager.GetPeerState(c.peer.Keyid).Clone()
+	if peerState == nil {
+		return NewSyncErrorInternal(fmt.Errorf("peer state not found for peer %q", c.peer.InstanceId))
+	}
+	peerState.LastHeartbeat = time.Now()
+	c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, peerState)
 	return nil
 }
 
@@ -472,13 +472,16 @@ func (c *syncSessionHandlerClient) HandleSendOperations(ctx context.Context, str
 
 func (c *syncSessionHandlerClient) HandleSendConfig(ctx context.Context, stream *bidiSyncCommandStream, item *v1.SyncStreamItem_SyncActionSendConfig) error {
 	c.l.Sugar().Debugf("received remote config update")
+	peerState := c.mgr.peerStateManager.GetPeerState(c.peer.Keyid).Clone()
+	if peerState == nil {
+		return NewSyncErrorInternal(fmt.Errorf("peer state for %q not found", c.peer.Keyid))
+	}
 	newRemoteConfig := item.Config
 	if newRemoteConfig == nil {
 		return NewSyncErrorProtocol(fmt.Errorf("received nil remote config"))
 	}
-	c.peerState.Config = newRemoteConfig
-	c.notifyPeerStateChanged()
-
+	peerState.Config = newRemoteConfig
+	c.mgr.peerStateManager.SetPeerState(c.peer.Keyid, peerState)
 	return nil
 }
 

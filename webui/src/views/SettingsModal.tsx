@@ -7,7 +7,6 @@ import {
   Radio,
   InputNumber,
   Row,
-  Card,
   Col,
   Collapse,
   Checkbox,
@@ -22,7 +21,7 @@ import { formatErrorAlert, useAlertApi } from "../components/Alerts";
 import { namePattern, validateForm } from "../lib/formutil";
 import { useConfig } from "../components/ConfigProvider";
 import { authenticationService, backrestService } from "../api";
-import { clone, fromJson, toJson, toJsonString } from "@bufbuild/protobuf";
+import { clone, fromJson, toJson } from "@bufbuild/protobuf";
 import {
   AuthSchema,
   Config,
@@ -81,6 +80,7 @@ export const SettingsModal = () => {
   const [form] = Form.useForm<FormData>();
   const [peerStates, setPeerStates] = useState<PeerState[]>([]);
   const [reloadOnCancel, setReloadOnCancel] = useState(false);
+  const [formEdited, setFormEdited] = useState(false);
 
   if (!config) {
     return null;
@@ -132,6 +132,7 @@ export const SettingsModal = () => {
       setConfig(await backrestService.setConfig(newConfig));
       setReloadOnCancel(true);
       alertsApi.success("已更新设置", 5);
+      setFormEdited(false);
     } catch (e: any) {
       alertsApi.error(formatErrorAlert(e, "操作错误: "), 15);
     }
@@ -155,7 +156,7 @@ export const SettingsModal = () => {
         width="60vw"
         footer={[
           <Button key="back" onClick={handleCancel}>
-            取消
+            {formEdited ? "取消" : "关闭"}
           </Button>,
           <Button key="submit" type="primary" onClick={handleOk}>
             提交
@@ -167,6 +168,7 @@ export const SettingsModal = () => {
           form={form}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
+          onValuesChange={() => setFormEdited(true)}
         >
           {users.length > 0 || config.auth?.disabled ? null : (
             <>
@@ -222,6 +224,8 @@ export const SettingsModal = () => {
                     peerStates={peerStates}
                   />
                 ),
+                /* hidden until multihost is stable */
+                style: { display: "none" },
               },
               {
                 key: "last",
@@ -336,7 +340,7 @@ const AuthenticationForm: React.FC<{
                   }}
                   block
                 >
-                  <PlusOutlined /> 添加用户账户
+                  <PlusOutlined /> Add user
                 </Button>
               </Form.Item>
             </>
@@ -560,17 +564,17 @@ const PeerFormListItem: React.FC<{
         <Col span={10}>
           <Form.Item
             name={[fieldName, "instanceId"]}
-            label="实例 ID"
+            label="Instance ID"
             rules={[
-              { required: true, message: "实例 ID为必填项" },
+              { required: true, message: "Instance ID is required" },
               {
                 pattern: namePattern,
                 message:
-                  "实例 ID中只能包含数字和字母，以及连接符 - 或下划线 _",
+                  "Instance ID must be alphanumeric with '_-.' allowed as separators",
               },
             ]}
           >
-            <Input placeholder="例如 my-backup-server" />
+            <Input placeholder="e.g. my-backup-server" />
           </Form.Item>
         </Col>
         <Col span={10}>

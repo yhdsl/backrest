@@ -86,6 +86,7 @@ services:
       - ./backrest/config:/config
       - ./backrest/cache:/cache
       - ./backrest/tmp:/tmp
+      - ./backrest/rclone:/root/.config/rclone # Mount for rclone config (needed when using rclone remotes)
       - /path/to/backup/data:/userdata  # Mount local paths to backup
       - /path/to/local/repos:/repos     # Mount local repos (optional for remote storage)
     environment:
@@ -111,11 +112,11 @@ services:
    a) Using the Install Script (Recommended)
    ```sh
    mkdir backrest && tar -xzvf backrest_Linux_x86_64.tar.gz -C backrest
-   cd backrest && sudo ./install.sh
+   cd backrest && ./install.sh
    ```
    This script will:
    - Move the Backrest binary to `/usr/local/bin`
-   - Create and start a systemd service
+   - Create and start a systemd service running as the current user (use `sudo ./install.sh` to install as root)
 
    b) Manual Installation with systemd
    ```sh
@@ -212,7 +213,7 @@ The install script will:
 Download the Windows installer for your architecture from the [releases page](https://github.com/garethgeorge/backrest/releases). The installer, named Backrest-setup-[arch].exe, will place Backrest and a GUI tray application in `%localappdata%\Programs\Backrest\`. The tray application, set to start on login, monitors Backrest.
 
 > [!TIP]
-> To override the default port before installation, set a user environment variable named BACKREST_PORT. On Windows 10+, navigate to Settings > About > Advanced system settings > Environment Variables. Under "User variables", create a new variable with the value "127.0.0.1:port" (e.g., "127.0.0.1:8080" for port 8080). If changing post-installation, re-run the installer to update shortcuts with the new port.
+> To override the default port before installation, set a user environment variable named BACKREST_PORT. On Windows 10+, navigate to Settings > About > Advanced system settings > Environment Variables. Under "User variables", create a new variable `BACKREST_PORT` with the value "127.0.0.1:port" (e.g., "127.0.0.1:8080" for port 8080). If changing post-installation, re-run the installer to update shortcuts with the new port.
 
 # Configuration
 

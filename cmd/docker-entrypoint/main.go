@@ -24,12 +24,15 @@ func main() {
 			os.Stderr.WriteString(" - " + key + "\n")
 		}
 	}
-	if len(os.Args) < 1 {
+	if len(os.Args) < 2 {
 		os.Stderr.WriteString("No command provided to run.\n")
 		os.Exit(1)
 	}
+	subcommand := os.Args[1]
+	args := os.Args[2:]
+	os.Stderr.WriteString("Running command: " + subcommand + " " + fmt.Sprint(args) + "\n")
 
-	cmd := exec.Command(os.Args[0], os.Args[1:]...)
+	cmd := exec.Command(subcommand, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

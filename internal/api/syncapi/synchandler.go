@@ -61,11 +61,15 @@ func (h *BackrestSyncHandler) Sync(ctx context.Context, stream *connect.BidiStre
 		zap.S().Errorf("sync handler stream error: %v", err)
 		var syncErr *SyncError
 		if errors.As(err, &syncErr) {
-			if sessionHandler.peerState != nil {
-				sessionHandler.peerState.ConnectionState = syncErr.State
-				sessionHandler.peerState.ConnectionStateMessage = syncErr.Message.Error()
-				sessionHandler.peerState.LastHeartbeat = time.Now()
-				sessionHandler.mgr.peerStateManager.SetPeerState(sessionHandler.peer.Keyid, sessionHandler.peerState)
+			if sessionHandler.peer != nil {
+				peerState := h.mgr.peerStateManager.GetPeerState(sessionHandler.peer.Keyid).Clone()
+				if peerState == nil {
+					peerState = newPeerState(sessionHandler.peer.InstanceId, sessionHandler.peer.Keyid)
+				}
+				peerState.ConnectionState = syncErr.State
+				peerState.ConnectionStateMessage = syncErr.Message.Error()
+				peerState.LastHeartbeat = time.Now()
+				h.mgr.peerStateManager.SetPeerState(sessionHandler.peer.Keyid, peerState)
 			}
 			switch syncErr.State {
 			case v1.SyncConnectionState_CONNECTION_STATE_ERROR_AUTH:
@@ -90,7 +94,6 @@ type syncSessionHandlerServer struct {
 
 	peer        *v1.Multihost_Peer // The authorized client peer this handler is associated with, set during OnConnectionEstablished.
 	permissions *permissions.PermissionSet
-	peerState   *PeerState // The state of the peer, used to track connection state and other metadata.
 
 	opIDLru   *lru.Cache[int64, int64] // original ID -> local ID
 	flowIDLru *lru.Cache[int64, int64] // original flow ID -> local flow ID
@@ -136,11 +139,11 @@ func (h *syncSessionHandlerServer) OnConnectionEstablished(ctx context.Context, 
 	}
 
 	// Configure the state for the connected peer.
-	h.peerState = newPeerState(peer.InstanceId, h.peer.Keyid)
-	h.peerState.ConnectionStateMessage = "connected"
-	h.peerState.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_CONNECTED
-	h.peerState.LastHeartbeat = time.Now()
-	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, h.peerState)
+	peerState := newPeerState(peer.InstanceId, h.peer.Keyid)
+	peerState.ConnectionStateMessage = "connected"
+	peerState.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_CONNECTED
+	peerState.LastHeartbeat = time.Now()
+	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, peerState)
 
 	zap.S().Infof("syncserver accepted a connection from client instance ID %q", h.peer.InstanceId)
 
@@ -175,8 +178,12 @@ func (h *syncSessionHandlerServer) OnConnectionEstablished(ctx context.Context, 
 }
 
 func (h *syncSessionHandlerServer) HandleHeartbeat(ctx context.Context, stream *bidiSyncCommandStream, item *v1.SyncStreamItem_SyncActionHeartbeat) error {
-	h.peerState.LastHeartbeat = time.Now()
-	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, h.peerState)
+	peerState := h.mgr.peerStateManager.GetPeerState(h.peer.Keyid).Clone()
+	if peerState == nil {
+		return NewSyncErrorInternal(fmt.Errorf("peer state for %q not found", h.peer.Keyid))
+	}
+	peerState.LastHeartbeat = time.Now()
+	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, peerState)
 	return nil
 }
 
@@ -322,8 +329,12 @@ func (h *syncSessionHandlerServer) HandleSendOperations(ctx context.Context, str
 }
 
 func (h *syncSessionHandlerServer) HandleSendConfig(ctx context.Context, stream *bidiSyncCommandStream, item *v1.SyncStreamItem_SyncActionSendConfig) error {
-	h.peerState.Config = item.GetConfig()
-	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, h.peerState)
+	peerState := h.mgr.peerStateManager.GetPeerState(h.peer.Keyid).Clone()
+	if peerState == nil {
+		return NewSyncErrorInternal(fmt.Errorf("peer state for %q not found", h.peer.Keyid))
+	}
+	peerState.Config = item.GetConfig()
+	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, peerState)
 	return nil
 }
 
@@ -331,15 +342,19 @@ func (h *syncSessionHandlerServer) HandleListResources(ctx context.Context, stre
 	zap.L().Debug("syncserver received resource list from client", zap.String("client_instance_id", h.peer.InstanceId),
 		zap.Any("repos", item.GetRepoIds()),
 		zap.Any("plans", item.GetPlanIds()))
+	peerState := h.mgr.peerStateManager.GetPeerState(h.peer.Keyid).Clone()
+	if peerState == nil {
+		return NewSyncErrorInternal(fmt.Errorf("peer state for %q not found", h.peer.Keyid))
+	}
 	repos := item.GetRepoIds()
 	plans := item.GetPlanIds()
 	for _, repoID := range repos {
-		h.peerState.KnownRepos[repoID] = struct{}{}
+		peerState.KnownRepos[repoID] = struct{}{}
 	}
 	for _, planID := range plans {
-		h.peerState.KnownPlans[planID] = struct{}{}
+		peerState.KnownPlans[planID] = struct{}{}
 	}
-	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, h.peerState)
+	h.mgr.peerStateManager.SetPeerState(h.peer.Keyid, peerState)
 	return nil
 }
 

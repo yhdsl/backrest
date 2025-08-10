@@ -357,78 +357,81 @@ export const OperationRow = ({
 };
 
 const SnapshotDetails = ({ snapshot }: { snapshot: ResticSnapshot }) => {
-  const summary: Partial<SnapshotSummary> = snapshot.summary || {};
-
-  const rows: React.ReactNode[] = [
-    <Row gutter={16} key={1}>
-      <Col span={8}>
-        <Typography.Text strong>用户名@主机名</Typography.Text>
-        <br />
-        {snapshot.username}@{snapshot.hostname}
-      </Col>
-      <Col span={12}>
-        <Typography.Text strong>标签</Typography.Text>
-        <br />
-        {snapshot.tags.join(", ")}
-      </Col>
-    </Row>,
-  ];
-
-  if (
-    summary.filesNew ||
-    summary.filesChanged ||
-    summary.filesUnmodified ||
-    summary.dataAdded ||
-    summary.totalFilesProcessed ||
-    summary.totalBytesProcessed
-  ) {
-    rows.push(
-      <Row gutter={16} key={2}>
-        <Col span={8}>
-          <Typography.Text strong>文件已添加</Typography.Text>
-          <br />
-          {"" + summary.filesNew}
-        </Col>
-        <Col span={8}>
-          <Typography.Text strong>文件已修改</Typography.Text>
-          <br />
-          {"" + summary.filesChanged}
-        </Col>
-        <Col span={8}>
-          <Typography.Text strong>文件未修改</Typography.Text>
-          <br />
-          {"" + summary.filesUnmodified}
-        </Col>
-      </Row>
-    );
-    rows.push(
-      <Row gutter={16} key={3}>
-        <Col span={8}>
-          <Typography.Text strong>已添加文件大小</Typography.Text>
-          <br />
-          {formatBytes(Number(summary.dataAdded))}
-        </Col>
-        <Col span={8}>
-          <Typography.Text strong>已处理文件大小</Typography.Text>
-          <br />
-          {formatBytes(Number(summary.totalBytesProcessed))}
-        </Col>
-        <Col span={8}>
-          <Typography.Text strong>已处理文件数目</Typography.Text>
-          <br />
-          {"" + summary.totalFilesProcessed}
-        </Col>
-      </Row>
-    );
-  }
+  const summary = snapshot.summary;
 
   return (
     <>
       <Typography.Text>
-        <Typography.Text strong>快照ID: </Typography.Text>
-        {normalizeSnapshotId(snapshot.id!)} <br />
-        {rows}
+        <Typography.Text strong>快照 ID: </Typography.Text>
+        {normalizeSnapshotId(snapshot.id!)}
       </Typography.Text>
+      <Row gutter={[16, 8]} style={{ marginTop: 8 }}>
+        <Col span={8}>
+          <Typography.Text strong>用户名@主机名</Typography.Text>
+          <br />
+          <Typography.Text type="secondary">
+            {snapshot.username}@{snapshot.hostname}
+          </Typography.Text>
+        </Col>
+        <Col span={12}>
+          <Typography.Text strong>标签</Typography.Text>
+          <br />
+          <Typography.Text type="secondary">
+            {snapshot.tags.join(", ")}
+          </Typography.Text>
+        </Col>
+      </Row>
+
+      {summary && (
+        <>
+          <Row gutter={[16, 8]} style={{ marginTop: 8 }}>
+            <Col span={8}>
+              <Typography.Text strong>Files Added</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {summary.filesNew.toLocaleString()}
+              </Typography.Text>
+            </Col>
+            <Col span={8}>
+              <Typography.Text strong>文件已添加</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {summary.filesChanged.toLocaleString()}
+              </Typography.Text>
+            </Col>
+            <Col span={8}>
+              <Typography.Text strong>文件已修改</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {summary.filesUnmodified.toLocaleString()}
+              </Typography.Text>
+            </Col>
+          </Row>
+          <Row gutter={[16, 8]}>
+            <Col span={8}>
+              <Typography.Text strong>已添加文件大小</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {formatBytes(Number(summary.dataAdded))}
+              </Typography.Text>
+            </Col>
+            <Col span={8}>
+              <Typography.Text strong>已处理文件大小</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {formatBytes(Number(summary.totalBytesProcessed))}
+              </Typography.Text>
+            </Col>
+            <Col span={8}>
+              <Typography.Text strong>已处理文件数目</Typography.Text>
+              <br />
+              <Typography.Text type="secondary">
+                {summary.totalFilesProcessed.toLocaleString()}
+              </Typography.Text>
+            </Col>
+          </Row>
+        </>
+      )}
     </>
   );
 };
@@ -505,22 +508,40 @@ const BackupOperationStatus = ({
       <>
         <Progress percent={progress} status="active" />
         <br />
-        <Row gutter={16}>
+        <Row gutter={[16, 8]}>
           <Col span={12}>
             <Typography.Text strong>已处理大小/总文件大小</Typography.Text>
             <br />
-            {formatBytes(Number(st.bytesDone))}/
-            {formatBytes(Number(st.totalBytes))}
+            <Typography.Text type="secondary">
+              {formatBytes(Number(st.bytesDone))} /{" "}
+              {formatBytes(Number(st.totalBytes))}
+            </Typography.Text>
           </Col>
           <Col span={12}>
             <Typography.Text strong>已处理数目/总文件数目</Typography.Text>
             <br />
-            {Number(st.filesDone)}/{Number(st.totalFiles)}
+            <Typography.Text type="secondary">
+              {Number(st.filesDone).toLocaleString()} /{" "}
+              {Number(st.totalFiles).toLocaleString()}
+            </Typography.Text>
           </Col>
         </Row>
-        {st.currentFile && st.currentFile.length > 0 ? (
-          <pre>Current file: {st.currentFile.join("\n")}</pre>
-        ) : null}
+        {st.currentFile && st.currentFile.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <Typography.Text strong>当前文件:</Typography.Text>
+            <pre
+              style={{
+                marginTop: 4,
+                padding: 8,
+                borderRadius: 4,
+                borderColor: "#d9d9d9",
+                fontSize: "0.85em",
+              }}
+            >
+              {st.currentFile.join("\n")}
+            </pre>
+          </div>
+        )}
       </>
     );
   } else if (status.entry.case === "summary") {
@@ -533,38 +554,43 @@ const BackupOperationStatus = ({
             ? normalizeSnapshotId(sum.snapshotId!)
             : "未创建任何快照"}
         </Typography.Text>
-        <Row gutter={16}>
+        <Row gutter={[16, 8]}>
           <Col span={8}>
             <Typography.Text strong>文件已添加</Typography.Text>
             <br />
-            {sum.filesNew.toString()}
+            <Typography.Text type="secondary">
+              {sum.filesNew.toString()}
+            </Typography.Text>
           </Col>
           <Col span={8}>
             <Typography.Text strong>文件已修改</Typography.Text>
             <br />
-            {sum.filesChanged.toString()}
+            <Typography.Text type="secondary">
+              {sum.filesChanged.toString()}
+            </Typography.Text>
           </Col>
           <Col span={8}>
             <Typography.Text strong>文件未修改</Typography.Text>
             <br />
-            {sum.filesUnmodified.toString()}
+            <Typography.Text type="secondary">
+              {sum.filesUnmodified.toString()}
+            </Typography.Text>
           </Col>
         </Row>
-        <Row gutter={16}>
+        <Row gutter={[16, 8]}>
           <Col span={8}>
             <Typography.Text strong>已添加文件大小</Typography.Text>
             <br />
-            {formatBytes(Number(sum.dataAdded))}
+            <Typography.Text type="secondary">
+              {formatBytes(Number(sum.dataAdded))}
+            </Typography.Text>
           </Col>
           <Col span={8}>
             <Typography.Text strong>已处理文件总大小</Typography.Text>
             <br />
-            {formatBytes(Number(sum.totalBytesProcessed))}
-          </Col>
-          <Col span={8}>
-            <Typography.Text strong>已处理文件总数目</Typography.Text>
-            <br />
-            {sum.totalFilesProcessed.toString()}
+            <Typography.Text type="secondary">
+              {formatBytes(Number(sum.totalBytesProcessed))}
+            </Typography.Text>
           </Col>
         </Row>
       </>

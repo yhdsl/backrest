@@ -38,18 +38,18 @@ func NewSyncManager(configMgr *config.ConfigManager, oplog *oplog.OpLog, orchest
 	config, err := configMgr.Get()
 	if err == nil {
 		for _, knownHostPeer := range config.GetMultihost().GetKnownHosts() {
-			state := peerStateManager.GetPeerState(knownHostPeer.Keyid)
+			state := peerStateManager.GetPeerState(knownHostPeer.Keyid).Clone()
 			if state == nil {
-				continue
+				state = newPeerState(knownHostPeer.InstanceId, knownHostPeer.Keyid)
 			}
 			state.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_DISCONNECTED
 			state.ConnectionStateMessage = "disconnected"
 			peerStateManager.SetPeerState(knownHostPeer.Keyid, state)
 		}
 		for _, authorizedClient := range config.GetMultihost().GetAuthorizedClients() {
-			state := peerStateManager.GetPeerState(authorizedClient.Keyid)
+			state := peerStateManager.GetPeerState(authorizedClient.Keyid).Clone()
 			if state == nil {
-				continue
+				state = newPeerState(authorizedClient.InstanceId, authorizedClient.Keyid)
 			}
 			state.ConnectionState = v1.SyncConnectionState_CONNECTION_STATE_DISCONNECTED
 			state.ConnectionStateMessage = "disconnected"

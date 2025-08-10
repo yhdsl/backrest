@@ -789,7 +789,7 @@ const RetentionPolicyView = () => {
               </Tooltip>
             </Radio.Button>
             <Radio.Button value={"policyTimeBucketed"}>
-              <Tooltip title="Restic 将删除超过指定时间段的快照。保留策略用于在每次备份操作结束后删除较旧的快照。">
+              <Tooltip title="Restic 将保留每个时间段的最后N个快照。保留策略用于在每次备份操作结束后删除较旧的快照。">
                 时间间隔
               </Tooltip>
             </Radio.Button>
