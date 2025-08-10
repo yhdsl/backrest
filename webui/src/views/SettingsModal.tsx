@@ -3,9 +3,7 @@ import {
   Modal,
   Input,
   Typography,
-  Select,
   Button,
-  Tooltip,
   Radio,
   InputNumber,
   Row,
@@ -13,6 +11,9 @@ import {
   Col,
   Collapse,
   Checkbox,
+  FormInstance,
+  Tooltip,
+  Select,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useShowModal } from "../components/ModalManager";
@@ -24,9 +25,19 @@ import { authenticationService, backrestService } from "../api";
 import { clone, fromJson, toJson, toJsonString } from "@bufbuild/protobuf";
 import {
   AuthSchema,
+  Config,
   ConfigSchema,
   UserSchema,
+  MultihostSchema,
+  Multihost_PeerSchema,
+  Multihost_Permission_Type,
 } from "../../gen/ts/v1/config_pb";
+import { PeerState } from "../../gen/ts/v1/syncservice_pb";
+import {
+  subscribeToPeerStates,
+  unsubscribeFromPeerStates,
+} from "../state/peerstates";
+import { PeerStateConnectionStatusIcon } from "../components/SyncStateIcon";
 
 interface FormData {
   auth: {
@@ -37,6 +48,30 @@ interface FormData {
     }[];
   };
   instance: string;
+  multihost: {
+    identity: {
+      keyId: string;
+    };
+    knownHosts: {
+      instanceId: string;
+      keyId: string;
+      keyIdVerified?: boolean;
+      instanceUrl: string;
+      permissions?: {
+        type: number;
+        scopes: string[];
+      }[];
+    }[];
+    authorizedClients: {
+      instanceId: string;
+      keyId: string;
+      keyIdVerified?: boolean;
+      permissions?: {
+        type: number;
+        scopes: string[];
+      }[];
+    }[];
+  };
 }
 
 export const SettingsModal = () => {
@@ -44,10 +79,22 @@ export const SettingsModal = () => {
   const showModal = useShowModal();
   const alertsApi = useAlertApi()!;
   const [form] = Form.useForm<FormData>();
+  const [peerStates, setPeerStates] = useState<PeerState[]>([]);
+  const [reloadOnCancel, setReloadOnCancel] = useState(false);
 
   if (!config) {
     return null;
   }
+
+  useEffect(() => {
+    const cb = (syncStates: PeerState[]) => {
+      setPeerStates(syncStates);
+    };
+    subscribeToPeerStates(cb);
+    return () => {
+      unsubscribeFromPeerStates(cb);
+    };
+  }, []);
 
   const handleOk = async () => {
     try {
@@ -71,6 +118,9 @@ export const SettingsModal = () => {
       newConfig.auth = fromJson(AuthSchema, formData.auth, {
         ignoreUnknownFields: false,
       });
+      newConfig.multihost = fromJson(MultihostSchema, formData.multihost, {
+        ignoreUnknownFields: false,
+      });
       newConfig.instance = formData.instance;
 
       if (!newConfig.auth?.users && !newConfig.auth?.disabled) {
@@ -80,18 +130,18 @@ export const SettingsModal = () => {
       }
 
       setConfig(await backrestService.setConfig(newConfig));
+      setReloadOnCancel(true);
       alertsApi.success("已更新设置", 5);
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
     } catch (e: any) {
       alertsApi.error(formatErrorAlert(e, "操作错误: "), 15);
-      console.error(e);
     }
   };
 
   const handleCancel = () => {
     showModal(null);
+    if (reloadOnCancel) {
+      window.location.reload();
+    }
   };
 
   const users = config.auth?.users || [];
@@ -102,7 +152,7 @@ export const SettingsModal = () => {
         open={true}
         onCancel={handleCancel}
         title={"设置"}
-        width="40vw"
+        width="60vw"
         footer={[
           <Button key="back" onClick={handleCancel}>
             取消
@@ -115,8 +165,8 @@ export const SettingsModal = () => {
         <Form
           autoComplete="off"
           form={form}
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 16 }}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
         >
           {users.length > 0 || config.auth?.disabled ? null : (
             <>
@@ -129,140 +179,564 @@ export const SettingsModal = () => {
               </p>
             </>
           )}
-          <Tooltip title="用于识别该 backrest 的唯一实例名称。请谨慎设置该值，创建后将无法修改。">
-            <Form.Item
-              hasFeedback
-              name="instance"
-              label="实例 ID"
-              required
-              initialValue={config.instance || ""}
-              rules={[
-                { required: true, message: "实例 ID 为必填项" },
-                {
-                  pattern: namePattern,
-                  message:
-                    "实例 ID 中只能包含数字和字母，以及连接符 - 或下划线 _",
-                },
-              ]}
-            >
-              <Input
-                placeholder={
-                  "该 backrest 安装的唯一实例名称 ，例如my-backrest-server"
-                }
-                disabled={!!config.instance}
-              />
-            </Form.Item>
-          </Tooltip>
           <Form.Item
-            label="禁用身份验证"
-            name={["auth", "disabled"]}
-            valuePropName="checked"
-            initialValue={config.auth?.disabled || false}
+            hasFeedback
+            name="instance"
+            label="实例 ID"
+            required
+            initialValue={config.instance || ""}
+            tooltip="用于识别该 backrest 的唯一实例名称。请谨慎设置该值，创建后将无法修改。"
+            rules={[
+              { required: true, message: "实例 ID 为必填项" },
+              {
+                pattern: namePattern,
+                message:
+                  "实例 ID 中只能包含数字和字母，以及连接符 - 或下划线 _",
+              },
+            ]}
           >
-            <Checkbox />
-          </Form.Item>
-          <Form.Item label="用户账户" required={true}>
-            <Form.List
-              name={["auth", "users"]}
-              initialValue={
-                config.auth?.users?.map((u) =>
-                  toJson(UserSchema, u, { alwaysEmitImplicit: true })
-                ) || []
+            <Input
+              placeholder={
+                "该 backrest 安装的唯一实例名称 ，例如my-backrest-server"
               }
-            >
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field, index) => {
-                    return (
-                      <Row key={field.key} gutter={16}>
-                        <Col span={11}>
-                          <Form.Item
-                            name={[field.name, "name"]}
-                            rules={[
-                              { required: true, message: "用户名为必填项" },
-                              {
-                                pattern: namePattern,
-                                message:
-                                  "用户名中只能包含数字和字母，以及连接符 - 或下划线 _",
-                              },
-                            ]}
-                          >
-                            <Input placeholder="用户名" />
-                          </Form.Item>
-                        </Col>
-                        <Col span={11}>
-                          <Form.Item
-                            name={[field.name, "passwordBcrypt"]}
-                            rules={[
-                              {
-                                required: true,
-                                message: "密码为必填项",
-                              },
-                            ]}
-                          >
-                            <Input.Password
-                              placeholder="密码"
-                              onFocus={() => {
-                                form.setFieldValue(
-                                  ["auth", "users", index, "needsBcrypt"],
-                                  true
-                                );
-                                form.setFieldValue(
-                                  ["auth", "users", index, "passwordBcrypt"],
-                                  ""
-                                );
-                              }}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={2}>
-                          <MinusCircleOutlined
-                            onClick={() => {
-                              remove(field.name);
-                            }}
-                          />
-                        </Col>
-                      </Row>
-                    );
-                  })}
-                  <Form.Item>
-                    <Button
-                      type="dashed"
-                      onClick={() => {
-                        add();
-                      }}
-                      block
-                    >
-                      <PlusOutlined /> 添加用户账户
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
+              disabled={!!config.instance}
+            />
           </Form.Item>
 
-          <Form.Item shouldUpdate label="预览">
-            {() => (
-              <Collapse
-                size="small"
-                items={[
-                  {
-                    key: "1",
-                    label: "使用 JSON 预览配置文件",
-                    children: (
+          <Collapse
+            items={[
+              {
+                key: "1",
+                label: "身份验证",
+                forceRender: true,
+                children: <AuthenticationForm form={form} config={config} />,
+              },
+              {
+                key: "2",
+                label: "多主机身份验证与共享",
+                forceRender: true,
+                children: (
+                  <MultihostIdentityForm
+                    form={form}
+                    config={config}
+                    peerStates={peerStates}
+                  />
+                ),
+              },
+              {
+                key: "last",
+                label: "预览",
+                children: (
+                  <Form.Item shouldUpdate wrapperCol={{ span: 24 }}>
+                    {() => (
                       <Typography>
                         <pre>
                           {JSON.stringify(form.getFieldsValue(), null, 2)}
                         </pre>
                       </Typography>
-                    ),
-                  },
-                ]}
-              />
-            )}
-          </Form.Item>
+                    )}
+                  </Form.Item>
+                ),
+              },
+            ]}
+          />
         </Form>
       </Modal>
     </>
+  );
+};
+
+const AuthenticationForm: React.FC<{
+  config: Config;
+  form: FormInstance<FormData>;
+}> = ({ form, config }) => {
+  return (
+    <>
+      <Form.Item
+        label="禁用身份验证"
+        name={["auth", "disabled"]}
+        valuePropName="checked"
+        initialValue={config.auth?.disabled || false}
+      >
+        <Checkbox />
+      </Form.Item>
+
+      <Form.Item label="用户账户" required={true}>
+        <Form.List
+          name={["auth", "users"]}
+          initialValue={
+            config.auth?.users?.map((u) =>
+              toJson(UserSchema, u, { alwaysEmitImplicit: true })
+            ) || []
+          }
+        >
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map((field, index) => {
+                return (
+                  <Row key={field.key} gutter={16}>
+                    <Col span={11}>
+                      <Form.Item
+                        name={[field.name, "name"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "用户名为必填项",
+                          },
+                          {
+                            pattern: namePattern,
+                            message:
+                              "用户名中只能包含数字和字母，以及连接符 - 或下划线 _",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="用户名" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={11}>
+                      <Form.Item
+                        name={[field.name, "passwordBcrypt"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "密码为必填项",
+                          },
+                        ]}
+                      >
+                        <Input.Password
+                          placeholder="密码"
+                          onFocus={() => {
+                            form.setFieldValue(
+                              ["auth", "users", index, "needsBcrypt"],
+                              true
+                            );
+                            form.setFieldValue(
+                              ["auth", "users", index, "passwordBcrypt"],
+                              ""
+                            );
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={2}>
+                      <MinusCircleOutlined
+                        onClick={() => {
+                          remove(field.name);
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                );
+              })}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => {
+                    add();
+                  }}
+                  block
+                >
+                  <PlusOutlined /> 添加用户账户
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+      </Form.Item>
+    </>
+  );
+};
+
+const MultihostIdentityForm: React.FC<{
+  config: Config;
+  form: FormInstance<FormData>;
+  peerStates: PeerState[];
+}> = ({ form, config, peerStates }) => {
+  return (
+    <>
+      <Typography.Paragraph italic>
+        多主机身份验证允许您在多个 Backrest 实例之间共享同一个存储库。
+        这在处理包含多个系统的备份的状态时非常有用。
+      </Typography.Paragraph>
+      <Typography.Paragraph italic>
+        该功能尚处于实验阶段，将来可能会出现版本不兼容的变化，需要同时更新所有的实例。
+      </Typography.Paragraph>
+
+      {/* Show the current instance's identity */}
+      <Form.Item
+        label="多主机身份验证"
+        name={["multihost", "identity", "keyId"]}
+        initialValue={config.multihost?.identity?.keyid || ""}
+        rules={[
+          {
+            required: true,
+            message: "需要启用多主机身份验证",
+          },
+        ]}
+        tooltip="多主机身份标识码用于在多主机设置中识别此实例。它由该实例的公钥加密派生得出。"
+        wrapperCol={{ span: 16 }}
+      >
+        <Row>
+          <Col flex="auto">
+            <Input
+              placeholder="多主机身份标识码"
+              disabled
+              value={config.multihost?.identity?.keyid}
+            />
+          </Col>
+          <Col>
+            <Button
+              type="link"
+              onClick={() =>
+                -navigator.clipboard.writeText(
+                  config.multihost?.identity?.keyid || ""
+                )
+              }
+            >
+              copy
+            </Button>
+          </Col>
+        </Row>
+      </Form.Item>
+
+      {/* Authorized client peers. */}
+      <Form.Item
+        label="实例授权"
+        tooltip="授权其他 Backrest 实例访问此实例上的存储库。"
+      >
+        <PeerFormList
+          form={form}
+          listName={["multihost", "authorizedClients"]}
+          showInstanceUrl={false}
+          itemTypeName="实例授权"
+          peerStates={peerStates}
+          config={config}
+          listType="authorizedClients"
+          initialValue={
+            config.multihost?.authorizedClients?.map((peer) =>
+              toJson(Multihost_PeerSchema, peer, { alwaysEmitImplicit: true })
+            ) || []
+          }
+        />
+      </Form.Item>
+
+      {/* Known host peers. */}
+      <Form.Item
+        label="已知主机"
+        tooltip="已知主机是该实例可以连接的其它 Backrest 实例。"
+      >
+        <PeerFormList
+          form={form}
+          listName={["multihost", "knownHosts"]}
+          showInstanceUrl={true}
+          itemTypeName="已知主机"
+          peerStates={peerStates}
+          config={config}
+          listType="knownHosts"
+          initialValue={
+            config.multihost?.knownHosts?.map((peer) =>
+              toJson(Multihost_PeerSchema, peer, { alwaysEmitImplicit: true })
+            ) || []
+          }
+        />
+      </Form.Item>
+    </>
+  );
+};
+
+const PeerFormList: React.FC<{
+  form: FormInstance<FormData>;
+  listName: string[];
+  showInstanceUrl: boolean;
+  itemTypeName: string;
+  peerStates: PeerState[];
+  initialValue: any[];
+  config: Config;
+  listType: "knownHosts" | "authorizedClients";
+}> = ({
+  form,
+  listName,
+  showInstanceUrl,
+  itemTypeName,
+  peerStates,
+  initialValue,
+  config,
+  listType,
+}) => {
+  return (
+    <Form.List name={listName} initialValue={initialValue}>
+      {(fields, { add, remove }, { errors }) => (
+        <>
+          {fields.map((field, index) => (
+            <PeerFormListItem
+              key={field.key}
+              form={form}
+              fieldName={field.name}
+              remove={remove}
+              showInstanceUrl={showInstanceUrl}
+              peerStates={peerStates}
+              isKnownHost={listType === "knownHosts"}
+              index={index}
+              config={config}
+              listType={listType}
+            />
+          ))}
+          <Form.Item>
+            <Button
+              type="dashed"
+              onClick={() => add({})}
+              block
+              icon={<PlusOutlined />}
+            >
+              Add {itemTypeName || "Peer"}
+            </Button>
+            <Form.ErrorList errors={errors} />
+          </Form.Item>
+        </>
+      )}
+    </Form.List>
+  );
+};
+
+const PeerFormListItem: React.FC<{
+  form: FormInstance<FormData>;
+  fieldName: number;
+  remove: (index: number | number[]) => void;
+  showInstanceUrl: boolean;
+  peerStates: PeerState[];
+  isKnownHost?: boolean;
+  index: number;
+  config: Config;
+  listType: "knownHosts" | "authorizedClients";
+}> = ({
+  form,
+  fieldName,
+  remove,
+  showInstanceUrl,
+  peerStates,
+  isKnownHost = false,
+  index,
+  config,
+  listType,
+}) => {
+  // Get the instance ID from the form to find the matching sync state, its a bit hacky but works reliably.
+  const keyId = isKnownHost
+    ? form.getFieldValue(["multihost", "knownHosts", index, "keyId"])
+    : form.getFieldValue(["multihost", "authorizedClients", index, "keyId"]);
+
+  const peerState = peerStates.find((state) => state.peerKeyid === keyId);
+
+  return (
+    <div
+      style={{
+        border: "1px solid #d9d9d9",
+        borderRadius: "6px",
+        padding: "16px",
+        marginBottom: "16px",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "8px",
+          right: "8px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
+        {peerState && <PeerStateConnectionStatusIcon peerState={peerState} />}
+        <MinusCircleOutlined
+          style={{
+            color: "#999",
+            cursor: "pointer",
+          }}
+          onClick={() => remove(fieldName)}
+        />
+      </div>
+
+      <Row gutter={16}>
+        <Col span={10}>
+          <Form.Item
+            name={[fieldName, "instanceId"]}
+            label="实例 ID"
+            rules={[
+              { required: true, message: "实例 ID为必填项" },
+              {
+                pattern: namePattern,
+                message:
+                  "实例 ID中只能包含数字和字母，以及连接符 - 或下划线 _",
+              },
+            ]}
+          >
+            <Input placeholder="例如 my-backup-server" />
+          </Form.Item>
+        </Col>
+        <Col span={10}>
+          <Form.Item
+            name={[fieldName, "keyId"]}
+            label="Key ID"
+            rules={[{ required: true, message: "Key ID is required" }]}
+          >
+            <Input placeholder="Public key identifier" />
+          </Form.Item>
+        </Col>
+        <Col span={4}>
+          <Form.Item
+            name={[fieldName, "keyIdVerified"]}
+            valuePropName="checked"
+          >
+            <Checkbox>Verified</Checkbox>
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {showInstanceUrl && (
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              name={[fieldName, "instanceUrl"]}
+              label="Instance URL"
+              rules={[
+                {
+                  required: showInstanceUrl,
+                  message: "Instance URL is required for known hosts",
+                },
+                { type: "url", message: "Please enter a valid URL" },
+              ]}
+            >
+              <Input placeholder="https://example.com:9898" />
+            </Form.Item>
+          </Col>
+        </Row>
+      )}
+
+      <PeerPermissionsTile
+        form={form}
+        fieldName={fieldName}
+        listType={listType}
+        config={config}
+      />
+    </div>
+  );
+};
+
+const PeerPermissionsTile: React.FC<{
+  form: FormInstance<FormData>;
+  fieldName: number;
+  listType: "knownHosts" | "authorizedClients";
+  config: Config;
+}> = ({ form, fieldName, listType, config }) => {
+  const repoOptions = (config.repos || []).map((repo) => ({
+    label: repo.id,
+    value: `repo:${repo.id}`,
+  }));
+
+  return (
+    <div>
+      <Typography.Text strong style={{ marginBottom: "8px", display: "block" }}>
+        Permissions
+      </Typography.Text>
+
+      <Form.List name={[fieldName, "permissions"]}>
+        {(
+          permissionFields,
+          { add: addPermission, remove: removePermission }
+        ) => (
+          <>
+            {permissionFields.map((permissionField) => (
+              <div
+                key={permissionField.key}
+                style={{
+                  border: "1px solid #d9d9d9",
+                  borderRadius: "4px",
+                  padding: "12px",
+                  marginBottom: "8px",
+                  backgroundColor: "transparent",
+                }}
+              >
+                <Row gutter={8} align="middle">
+                  <Col span={11}>
+                    <Form.Item
+                      name={[permissionField.name, "type"]}
+                      label="Type"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Permission type is required",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Select permission type">
+                        <Select.Option
+                          value={
+                            Multihost_Permission_Type.PERMISSION_READ_WRITE_CONFIG
+                          }
+                        >
+                          Edit Repo Configuration
+                        </Select.Option>
+                        <Select.Option
+                          value={
+                            Multihost_Permission_Type.PERMISSION_READ_OPERATIONS
+                          }
+                        >
+                          Read Operations
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={11}>
+                    <Form.Item
+                      name={[permissionField.name, "scopes"]}
+                      label="Scopes"
+                      rules={[
+                        {
+                          required: true,
+                          message: "At least one scope is required",
+                        },
+                      ]}
+                    >
+                      <Select
+                        mode="multiple"
+                        placeholder="Select repositories or use * for all"
+                        options={[
+                          { label: "All Repositories (*)", value: "*" },
+                          ...repoOptions,
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={2}>
+                    <MinusCircleOutlined
+                      style={{
+                        color: "#999",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                      }}
+                      onClick={() => removePermission(permissionField.name)}
+                    />
+                  </Col>
+                </Row>
+              </div>
+            ))}
+            <Button
+              type="dashed"
+              onClick={() =>
+                addPermission({
+                  type: Multihost_Permission_Type.PERMISSION_READ_OPERATIONS,
+                  scopes: ["*"],
+                })
+              }
+              icon={<PlusOutlined />}
+              size="small"
+              style={{ width: "100%" }}
+            >
+              Add Permission
+            </Button>
+          </>
+        )}
+      </Form.List>
+    </div>
   );
 };

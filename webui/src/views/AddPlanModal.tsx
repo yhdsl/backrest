@@ -212,64 +212,62 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           disabled={confirmLoading}
         >
           {/* Plan.id */}
-          <Tooltip title="后台用于识别该调度计划的唯一标识名称，例如s3-myplan。注意创建后将无法修改。">
-            <Form.Item<Plan>
-              hasFeedback
-              name="id"
-              label="调度计划名称"
-              initialValue={template ? template.id : ""}
-              validateTrigger={["onChange", "onBlur"]}
-              rules={[
-                {
-                  required: true,
-                  message: "请输入调度计划名称",
+          <Form.Item<Plan>
+            hasFeedback
+            name="id"
+            label="调度计划名称"
+            initialValue={template ? template.id : ""}
+            validateTrigger={["onChange", "onBlur"]}
+            tooltip="后台用于识别该调度计划的唯一标识名称，例如s3-myplan。注意创建后将无法修改。"
+            rules={[
+              {
+                required: true,
+                message: "请输入调度计划名称",
+              },
+              {
+                validator: async (_, value) => {
+                  if (template) return;
+                  if (config?.plans?.find((r) => r.id === value)) {
+                    throw new Error("调度计划名称已存在");
+                  }
                 },
-                {
-                  validator: async (_, value) => {
-                    if (template) return;
-                    if (config?.plans?.find((r) => r.id === value)) {
-                      throw new Error("调度计划名称已存在");
-                    }
-                  },
-                  message: "调度计划名称已存在",
-                },
-                {
-                  pattern: namePattern,
-                  message:
-                    "名称中只能包含数字和字母，以及连接符 - 或下划线 _",
-                },
-              ]}
-            >
-              <Input
-                placeholder={"plan" + ((config?.plans?.length || 0) + 1)}
-                disabled={!!template}
-              />
-            </Form.Item>
-          </Tooltip>
+                message: "调度计划名称已存在",
+              },
+              {
+                pattern: namePattern,
+                message:
+                  "名称中只能包含数字和字母，以及连接符 - 或下划线 _",
+              },
+            ]}
+          >
+            <Input
+              placeholder={"plan" + ((config?.plans?.length || 0) + 1)}
+              disabled={!!template}
+            />
+          </Form.Item>
 
           {/* Plan.repo */}
-          <Tooltip title="Backrest 用于储存快照的储存库地址">
-            <Form.Item<Plan>
-              name="repo"
-              label="储存库"
-              validateTrigger={["onChange", "onBlur"]}
-              initialValue={template ? template.repo : ""}
-              rules={[
-                {
-                  required: true,
-                  message: "请选择一个储存库",
-                },
-              ]}
-            >
-              <Select
-                // defaultValue={repos.length > 0 ? repos[0].id : undefined}
-                options={repos.map((repo) => ({
-                  value: repo.id,
-                }))}
-                disabled={!!template}
-              />
-            </Form.Item>
-          </Tooltip>
+          <Form.Item<Plan>
+            name="repo"
+            label="储存库"
+            validateTrigger={["onChange", "onBlur"]}
+            initialValue={template ? template.repo : ""}
+            tooltip="Backrest 用于储存快照的储存库地址"
+            rules={[
+              {
+                required: true,
+                message: "请选择一个储存库",
+              },
+            ]}
+          >
+            <Select
+              // defaultValue={repos.length > 0 ? repos[0].id : undefined}
+              options={repos.map((repo) => ({
+                value: repo.id,
+              }))}
+              disabled={!!template}
+            />
+          </Form.Item>
 
           {/* Plan.paths */}
           <Form.Item label="路径" required={true}>
@@ -280,32 +278,35 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
             >
               {(fields, { add, remove }, { errors }) => (
                 <>
-                  {fields.map((field, index) => (
-                    <Form.Item key={field.key}>
-                      <Form.Item
-                        {...field}
-                        validateTrigger={["onChange", "onBlur"]}
-                        initialValue={""}
-                        rules={[
-                          {
-                            required: true,
-                            message: "请输入路径地址",
-                          },
-                        ]}
-                        noStyle
-                      >
-                        <URIAutocomplete
-                          style={{ width: "90%" }}
-                          onBlur={() => form.validateFields()}
+                  {fields.map((field, index) => {
+                    const { key, ...restField } = field;
+                    return (
+                      <Form.Item key={field.key}>
+                        <Form.Item
+                          {...restField}
+                          validateTrigger={["onChange", "onBlur"]}
+                          initialValue={""}
+                          rules={[
+                            {
+                              required: true,
+                              message: "请输入路径地址",
+                            },
+                          ]}
+                          noStyle
+                        >
+                          <URIAutocomplete
+                            style={{ width: "90%" }}
+                            onBlur={() => form.validateFields()}
+                          />
+                        </Form.Item>
+                        <MinusCircleOutlined
+                          className="dynamic-delete-button"
+                          onClick={() => remove(field.name)}
+                          style={{ paddingLeft: "5px" }}
                         />
                       </Form.Item>
-                      <MinusCircleOutlined
-                        className="dynamic-delete-button"
-                        onClick={() => remove(field.name)}
-                        style={{ paddingLeft: "5px" }}
-                      />
-                    </Form.Item>
-                  ))}
+                    );
+                  })}
                   <Form.Item>
                     <Button
                       type="dashed"
@@ -323,8 +324,10 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           </Form.Item>
 
           {/* Plan.excludes */}
-          <Tooltip
-            title={
+          <Form.Item
+            label="排除规则"
+            required={false}
+            tooltip={
               <>
                 指定不会备份至储存库数据的排除规则。查看{" "}
                 <a
@@ -337,18 +340,19 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
               </>
             }
           >
-            <Form.Item label="排除规则" required={false}>
-              <Form.List
-                name="excludes"
-                rules={[]}
-                initialValue={template ? template.excludes : []}
-              >
-                {(fields, { add, remove }, { errors }) => (
-                  <>
-                    {fields.map((field, index) => (
+            <Form.List
+              name="excludes"
+              rules={[]}
+              initialValue={template ? template.excludes : []}
+            >
+              {(fields, { add, remove }, { errors }) => (
+                <>
+                  {fields.map((field, index) => {
+                    const { key, ...restField } = field;
+                    return (
                       <Form.Item required={false} key={field.key}>
                         <Form.Item
-                          {...field}
+                          {...restField}
                           validateTrigger={["onChange", "onBlur"]}
                           initialValue={""}
                           rules={[
@@ -371,27 +375,29 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                           style={{ paddingLeft: "5px" }}
                         />
                       </Form.Item>
-                    ))}
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => add()}
-                        style={{ width: "90%" }}
-                        icon={<PlusOutlined />}
-                      >
-                        添加排除规则模式
-                      </Button>
-                      <Form.ErrorList errors={errors} />
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
-            </Form.Item>
-          </Tooltip>
+                    );
+                  })}
+                  <Form.Item>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      style={{ width: "90%" }}
+                      icon={<PlusOutlined />}
+                    >
+                      添加排除规则模式
+                    </Button>
+                    <Form.ErrorList errors={errors} />
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          </Form.Item>
 
           {/* Plan.iexcludes */}
-          <Tooltip
-            title={
+          <Form.Item
+            label="排除规则 (不区分大小写)"
+            required={false}
+            tooltip={
               <>
                 指定不会备份至储存库数据的排除规则 (不区分大小写)。查看{" "}
                 <a
@@ -404,18 +410,19 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
               </>
             }
           >
-            <Form.Item label="排除规则 (不区分大小写)" required={false}>
-              <Form.List
-                name="iexcludes"
-                rules={[]}
-                initialValue={template ? template.iexcludes : []}
-              >
-                {(fields, { add, remove }, { errors }) => (
-                  <>
-                    {fields.map((field, index) => (
+            <Form.List
+              name="iexcludes"
+              rules={[]}
+              initialValue={template ? template.iexcludes : []}
+            >
+              {(fields, { add, remove }, { errors }) => (
+                <>
+                  {fields.map((field, index) => {
+                    const { key, ...restField } = field;
+                    return (
                       <Form.Item required={false} key={field.key}>
                         <Form.Item
-                          {...field}
+                          {...restField}
                           validateTrigger={["onChange", "onBlur"]}
                           initialValue={""}
                           rules={[
@@ -438,23 +445,23 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
                           style={{ paddingLeft: "5px" }}
                         />
                       </Form.Item>
-                    ))}
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => add()}
-                        style={{ width: "90%" }}
-                        icon={<PlusOutlined />}
-                      >
-                        添加排除规则模式 (不区分大小写)
-                      </Button>
-                      <Form.ErrorList errors={errors} />
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
-            </Form.Item>
-          </Tooltip>
+                    );
+                  })}
+                  <Form.Item>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      style={{ width: "90%" }}
+                      icon={<PlusOutlined />}
+                    >
+                      添加排除规则模式 (不区分大小写)
+                    </Button>
+                    <Form.ErrorList errors={errors} />
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          </Form.Item>
 
           {/* Plan.cron */}
           <Form.Item label="备份调度">
@@ -475,31 +482,37 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
             <Form.List name="backup_flags">
               {(fields, { add, remove }, { errors }) => (
                 <>
-                  {fields.map((field, index) => (
-                    <Form.Item required={false} key={field.key}>
-                      <Form.Item
-                        {...field}
-                        validateTrigger={["onChange", "onBlur"]}
-                        rules={[
-                          {
-                            required: true,
-                            whitespace: true,
-                            pattern: /^\-\-?.*$/,
-                            message:
+                  {fields.map((field, index) => {
+                    const { key, ...restField } = field;
+                    return (
+                      <Form.Item required={false} key={field.key}>
+                        <Form.Item
+                          {...restField}
+                          validateTrigger={["onChange", "onBlur"]}
+                          rules={[
+                            {
+                              required: true,
+                              whitespace: true,
+                              pattern: /^\-\-?.*$/,
+                              message:
                               "输入应当为一个命令行 flag，查看命令 restic backup --help 输出了解可用的 flag",
-                          },
-                        ]}
-                        noStyle
-                      >
-                        <Input placeholder="--flag" style={{ width: "90%" }} />
+                            },
+                          ]}
+                          noStyle
+                        >
+                          <Input
+                            placeholder="--flag"
+                            style={{ width: "90%" }}
+                          />
+                        </Form.Item>
+                        <MinusCircleOutlined
+                          className="dynamic-delete-button"
+                          onClick={() => remove(index)}
+                          style={{ paddingLeft: "5px" }}
+                        />
                       </Form.Item>
-                      <MinusCircleOutlined
-                        className="dynamic-delete-button"
-                        onClick={() => remove(index)}
-                        style={{ paddingLeft: "5px" }}
-                      />
-                    </Form.Item>
-                  ))}
+                    );
+                  })}
                   <Form.Item>
                     <Button
                       type="dashed"

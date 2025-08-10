@@ -142,10 +142,10 @@ export const OperationTreeView = ({
       primaryTree = instTree;
     } else {
       otherTrees.push(
-        <>
+        <div key={instance} style={{ marginTop: "20px" }}>
           <Typography.Title level={4}>{instance}</Typography.Title>
           {instTree}
-        </>
+        </div>
       );
     }
   }
@@ -286,7 +286,10 @@ const buildTree = (
       let title: React.ReactNode = key;
       if (title === "_unassociated_") {
         title = (
-          <Tooltip title="“_未关联_” 实例ID表明操作未包含 `created-by:` 标签，该标签用于记录创建它们的 backrest 实例。">
+          <Tooltip
+            key={`tooltip-instance-${key}`}
+            title="“_未关联_” 实例ID表明操作未包含 `created-by:` 标签，该标签用于记录创建它们的 backrest 实例。"
+          >
             _未关联_
           </Tooltip>
         );
@@ -310,13 +313,19 @@ const buildTree = (
       let title: React.ReactNode = value[0].planID;
       if (title === "_unassociated_") {
         title = (
-          <Tooltip title="“_未关联_” 调度计划ID表明操作未包含 `plan:` 标签，该标签用于记录创建它们的备份调度计划。">
+          <Tooltip
+            key={`tooltip-plan-unassociated-${key}`}
+            title="“_未关联_” 调度计划ID表明操作未包含 `plan:` 标签，该标签用于记录创建它们的备份调度计划。"
+          >
             _未关联_
           </Tooltip>
         );
       } else if (title === "_system_") {
         title = (
-          <Tooltip title="“_系统_” 调度计划ID表明操作与单一调度计划无关，而是储存库等级的检查(check)操作或修剪(prune)等操作。">
+          <Tooltip
+            key={`tooltip-plan-system-${key}`}
+            title="“_系统_” 调度计划ID表明操作与单一调度计划无关，而是储存库等级的检查(check)操作或修剪(prune)等操作。"
+          >
             _系统_
           </Tooltip>
         );

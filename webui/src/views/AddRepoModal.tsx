@@ -173,7 +173,10 @@ export const AddRepoModal = ({ template }: { template: Repo | null }) => {
             取消
           </Button>,
           template != null ? (
-            <Tooltip title="从配置文件中移除储存库，但不会从本地文件中删除 Restic 储存库">
+            <Tooltip
+              key="delete-tooltip"
+              title="从配置文件中移除储存库，但不会从本地文件中删除 Restic 储存库"
+            >
               <ConfirmButton
                 key="delete"
                 type="primary"
@@ -405,35 +408,38 @@ export const AddRepoModal = ({ template }: { template: Repo | null }) => {
               >
                 {(fields, { add, remove }, { errors }) => (
                   <>
-                    {fields.map((field, index) => (
-                      <Form.Item key={field.key}>
-                        <Form.Item
-                          {...field}
-                          validateTrigger={["onChange", "onBlur"]}
-                          rules={[
-                            {
-                              required: true,
-                              whitespace: true,
-                              pattern: /^[\w-]+=.*$/,
-                              message:
+                    {fields.map((field, index) => {
+                      const { key, ...restField } = field;
+                      return (
+                        <Form.Item key={field.key}>
+                          <Form.Item
+                            {...restField}
+                            validateTrigger={["onChange", "onBlur"]}
+                            rules={[
+                              {
+                                required: true,
+                                whitespace: true,
+                                pattern: /^[\w-]+=.*$/,
+                                message:
                                 "环境变量必须设置为 KEY=VALUE 的形式",
-                            },
-                          ]}
-                          noStyle
-                        >
-                          <Input
-                            placeholder="KEY=VALUE"
-                            onBlur={() => form.validateFields()}
-                            style={{ width: "90%" }}
+                              },
+                            ]}
+                            noStyle
+                          >
+                            <Input
+                              placeholder="KEY=VALUE"
+                              onBlur={() => form.validateFields()}
+                              style={{ width: "90%" }}
+                            />
+                          </Form.Item>
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => remove(index)}
+                            style={{ paddingLeft: "5px" }}
                           />
                         </Form.Item>
-                        <MinusCircleOutlined
-                          className="dynamic-delete-button"
-                          onClick={() => remove(index)}
-                          style={{ paddingLeft: "5px" }}
-                        />
-                      </Form.Item>
-                    ))}
+                      );
+                    })}
                     <Form.Item>
                       <Button
                         type="dashed"
@@ -456,31 +462,37 @@ export const AddRepoModal = ({ template }: { template: Repo | null }) => {
             <Form.List name="flags">
               {(fields, { add, remove }, { errors }) => (
                 <>
-                  {fields.map((field, index) => (
-                    <Form.Item required={false} key={field.key}>
-                      <Form.Item
-                        {...field}
-                        validateTrigger={["onChange", "onBlur"]}
-                        rules={[
-                          {
-                            required: true,
-                            whitespace: true,
-                            pattern: /^\-\-?.*$/,
-                            message:
+                  {fields.map((field, index) => {
+                    const { key, ...restField } = field;
+                    return (
+                      <Form.Item required={false} key={field.key}>
+                        <Form.Item
+                          {...restField}
+                          validateTrigger={["onChange", "onBlur"]}
+                          rules={[
+                            {
+                              required: true,
+                              whitespace: true,
+                              pattern: /^\-\-?.*$/,
+                              message:
                               "输入应当为一个命令行 flag，查看命令 restic --help 输出了解可用的 flag",
-                          },
-                        ]}
-                        noStyle
-                      >
-                        <Input placeholder="--flag" style={{ width: "90%" }} />
+                            },
+                          ]}
+                          noStyle
+                        >
+                          <Input
+                            placeholder="--flag"
+                            style={{ width: "90%" }}
+                          />
+                        </Form.Item>
+                        <MinusCircleOutlined
+                          className="dynamic-delete-button"
+                          onClick={() => remove(index)}
+                          style={{ paddingLeft: "5px" }}
+                        />
                       </Form.Item>
-                      <MinusCircleOutlined
-                        className="dynamic-delete-button"
-                        onClick={() => remove(index)}
-                        style={{ paddingLeft: "5px" }}
-                      />
-                    </Form.Item>
-                  ))}
+                    );
+                  })}
                   <Form.Item>
                     <Button
                       type="dashed"
