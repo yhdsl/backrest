@@ -59,7 +59,7 @@ export const ConfirmButton = React.forwardRef<
     };
 
     return (
-      <SpinButton {...props} ref={ref} onClickAsync={onClick}>
+      <SpinButton {...props} ref={ref} onClickAsync={onClick} color="danger">
         {clicked ? confirmTitle : children}
       </SpinButton>
     );
