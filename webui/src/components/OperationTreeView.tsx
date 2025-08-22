@@ -316,7 +316,7 @@ const DisplayOperationTree = ({
                           type="secondary"
                           style={{ fontSize: "12px", marginLeft: "8px" }}
                         >
-                          {children === 1 ? "1 item" : `${children} items`}
+                          {children === 1 ? "1 条操作" : `${children} 条操作`}
                         </Typography.Text>
                       )}
                     </>
