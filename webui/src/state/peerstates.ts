@@ -27,7 +27,7 @@ const subscribeToSyncStates = async (
         }
       } catch (error) {
         if (!abortController.signal.aborted) {
-          console.warn("Error in sync state stream:", error);
+          console.warn("同步状态流时出错:", error);
         }
       }
       await new Promise(resolve => setTimeout(resolve, nextConnWaitUntil - new Date().getTime()));
@@ -63,7 +63,7 @@ export const unsubscribeFromPeerStates = (
       signal: abortController.signal,
     });
   }, (updatedStates) => {
-    console.log("Received updated states for peers: ", updatedStates);
+    console.log("已从远程更新状态: ", updatedStates);
     for (const state of updatedStates) {
       peerStates.set(state.peerKeyid, state);
     }

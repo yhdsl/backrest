@@ -386,21 +386,21 @@ const SnapshotDetails = ({ snapshot }: { snapshot: ResticSnapshot }) => {
         <>
           <Row gutter={[16, 8]} style={{ marginTop: 8 }}>
             <Col span={8}>
-              <Typography.Text strong>Files Added</Typography.Text>
+              <Typography.Text strong>文件已添加</Typography.Text>
               <br />
               <Typography.Text type="secondary">
                 {summary.filesNew.toLocaleString()}
               </Typography.Text>
             </Col>
             <Col span={8}>
-              <Typography.Text strong>文件已添加</Typography.Text>
+              <Typography.Text strong>文件已修改</Typography.Text>
               <br />
               <Typography.Text type="secondary">
                 {summary.filesChanged.toLocaleString()}
               </Typography.Text>
             </Col>
             <Col span={8}>
-              <Typography.Text strong>文件已修改</Typography.Text>
+              <Typography.Text strong>文件未修改</Typography.Text>
               <br />
               <Typography.Text type="secondary">
                 {summary.filesUnmodified.toLocaleString()}

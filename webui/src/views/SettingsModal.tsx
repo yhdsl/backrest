@@ -340,7 +340,7 @@ const AuthenticationForm: React.FC<{
                   }}
                   block
                 >
-                  <PlusOutlined /> Add user
+                  <PlusOutlined /> 添加用户
                 </Button>
               </Form.Item>
             </>
@@ -359,11 +359,11 @@ const MultihostIdentityForm: React.FC<{
   return (
     <>
       <Typography.Paragraph italic>
-        多主机身份验证允许您在多个 Backrest 实例之间共享同一个存储库。
-        这在处理包含多个系统的备份的状态时非常有用。
+        多主机身份验证允许您在多个 Backrest 实例之间共享同一个储存库。
+        这在处理包含多个系统的备份状态时非常有用。
       </Typography.Paragraph>
       <Typography.Paragraph italic>
-        该功能尚处于实验阶段，将来可能会出现版本不兼容的变化，需要同时更新所有的实例。
+        该功能尚处于实验阶段，将来可能会出现版本不兼容的变化，届时需要同时更新所有的实例。
       </Typography.Paragraph>
 
       {/* Show the current instance's identity */}
@@ -377,7 +377,7 @@ const MultihostIdentityForm: React.FC<{
             message: "需要启用多主机身份验证",
           },
         ]}
-        tooltip="多主机身份标识码用于在多主机设置中识别此实例。它由该实例的公钥加密派生得出。"
+        tooltip="多主机身份标识码用于在多主机设置中识别此实例。它由该实例的公钥加密派生得来。"
         wrapperCol={{ span: 16 }}
       >
         <Row>
@@ -397,7 +397,7 @@ const MultihostIdentityForm: React.FC<{
                 )
               }
             >
-              copy
+              复制
             </Button>
           </Col>
         </Row>
@@ -406,7 +406,7 @@ const MultihostIdentityForm: React.FC<{
       {/* Authorized client peers. */}
       <Form.Item
         label="实例授权"
-        tooltip="授权其他 Backrest 实例访问此实例上的存储库。"
+        tooltip="授权其它 Backrest 实例访问此实例上的储存库。"
       >
         <PeerFormList
           form={form}
@@ -492,7 +492,7 @@ const PeerFormList: React.FC<{
               block
               icon={<PlusOutlined />}
             >
-              Add {itemTypeName || "Peer"}
+              添加 {itemTypeName || "Peer"}
             </Button>
             <Form.ErrorList errors={errors} />
           </Form.Item>
@@ -564,26 +564,26 @@ const PeerFormListItem: React.FC<{
         <Col span={10}>
           <Form.Item
             name={[fieldName, "instanceId"]}
-            label="Instance ID"
+            label="实例 ID"
             rules={[
-              { required: true, message: "Instance ID is required" },
+              { required: true, message: "实例 ID 为必填项" },
               {
                 pattern: namePattern,
                 message:
-                  "Instance ID must be alphanumeric with '_-.' allowed as separators",
+                  "实例 ID 中只能包含数字和字母，以及分隔符 “_-.”",
               },
             ]}
           >
-            <Input placeholder="e.g. my-backup-server" />
+            <Input placeholder="例如 my-backup-server" />
           </Form.Item>
         </Col>
         <Col span={10}>
           <Form.Item
             name={[fieldName, "keyId"]}
-            label="Key ID"
-            rules={[{ required: true, message: "Key ID is required" }]}
+            label="密钥 ID"
+            rules={[{ required: true, message: "密钥 ID 为必填项" }]}
           >
-            <Input placeholder="Public key identifier" />
+            <Input placeholder="公钥标识符" />
           </Form.Item>
         </Col>
         <Col span={4}>
@@ -591,7 +591,7 @@ const PeerFormListItem: React.FC<{
             name={[fieldName, "keyIdVerified"]}
             valuePropName="checked"
           >
-            <Checkbox>Verified</Checkbox>
+            <Checkbox>已验证</Checkbox>
           </Form.Item>
         </Col>
       </Row>
@@ -601,13 +601,13 @@ const PeerFormListItem: React.FC<{
           <Col span={24}>
             <Form.Item
               name={[fieldName, "instanceUrl"]}
-              label="Instance URL"
+              label="实例 URL"
               rules={[
                 {
                   required: showInstanceUrl,
-                  message: "Instance URL is required for known hosts",
+                  message: "位于已知主机，需要一个实例 URL",
                 },
-                { type: "url", message: "Please enter a valid URL" },
+                { type: "url", message: "请输入一个合法的 URL" },
               ]}
             >
               <Input placeholder="https://example.com:9898" />
@@ -640,7 +640,7 @@ const PeerPermissionsTile: React.FC<{
   return (
     <div>
       <Typography.Text strong style={{ marginBottom: "8px", display: "block" }}>
-        Permissions
+        权限
       </Typography.Text>
 
       <Form.List name={[fieldName, "permissions"]}>
@@ -668,24 +668,24 @@ const PeerPermissionsTile: React.FC<{
                       rules={[
                         {
                           required: true,
-                          message: "Permission type is required",
+                          message: "权限类型为必填项",
                         },
                       ]}
                     >
-                      <Select placeholder="Select permission type">
+                      <Select placeholder="选择权限类型">
                         <Select.Option
                           value={
                             Multihost_Permission_Type.PERMISSION_READ_WRITE_CONFIG
                           }
                         >
-                          Edit Repo Configuration
+                          编辑储存库配置
                         </Select.Option>
                         <Select.Option
                           value={
                             Multihost_Permission_Type.PERMISSION_READ_OPERATIONS
                           }
                         >
-                          Read Operations
+                          读取操作
                         </Select.Option>
                       </Select>
                     </Form.Item>
@@ -693,19 +693,19 @@ const PeerPermissionsTile: React.FC<{
                   <Col span={11}>
                     <Form.Item
                       name={[permissionField.name, "scopes"]}
-                      label="Scopes"
+                      label="作用域"
                       rules={[
                         {
                           required: true,
-                          message: "At least one scope is required",
+                          message: "至少一个作用域为必填项",
                         },
                       ]}
                     >
                       <Select
                         mode="multiple"
-                        placeholder="Select repositories or use * for all"
+                        placeholder="选择作用的储存库，或者使用 * 授权访问全部储存库"
                         options={[
-                          { label: "All Repositories (*)", value: "*" },
+                          { label: "全部储存库 (*)", value: "*" },
                           ...repoOptions,
                         ]}
                       />
@@ -736,7 +736,7 @@ const PeerPermissionsTile: React.FC<{
               size="small"
               style={{ width: "100%" }}
             >
-              Add Permission
+              添加权限
             </Button>
           </>
         )}

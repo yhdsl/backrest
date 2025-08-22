@@ -71,48 +71,48 @@ export const PeerStateConnectionStatusIcon = ({
       case SyncConnectionState.CONNECTION_STATE_CONNECTED:
         return (
           baseMessage +
-          "Connected" +
+          "已连接" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
       case SyncConnectionState.CONNECTION_STATE_PENDING:
         return (
           baseMessage +
-          "Connecting..." +
+          "连接中..." +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
       case SyncConnectionState.CONNECTION_STATE_RETRY_WAIT:
         return (
           baseMessage +
-          "Retrying connection" +
+          "重新连接" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
       case SyncConnectionState.CONNECTION_STATE_DISCONNECTED:
         return (
           baseMessage +
-          "Disconnected" +
+          "断开连接" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
       case SyncConnectionState.CONNECTION_STATE_ERROR_AUTH:
         return (
           baseMessage +
-          "Authentication error" +
+          "身份验证错误" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
       case SyncConnectionState.CONNECTION_STATE_ERROR_PROTOCOL:
         return (
           baseMessage +
-          "Protocol error" +
+          "协议错误" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
       case SyncConnectionState.CONNECTION_STATE_ERROR_INTERNAL:
         return (
           baseMessage +
-          "Internal error" +
+          "网络异常" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
 
@@ -120,7 +120,7 @@ export const PeerStateConnectionStatusIcon = ({
       default:
         return (
           baseMessage +
-          "Unknown status" +
+          "未知状态" +
           (peerState.statusMessage ? ` - ${peerState.statusMessage}` : "")
         );
     }

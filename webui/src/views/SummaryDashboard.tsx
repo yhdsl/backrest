@@ -366,7 +366,7 @@ const MultihostSummary = ({
     <>
       {knownHostTiles.length > 0 ? (
         <>
-          <Typography.Title level={3}>Remote Hosts</Typography.Title>
+          <Typography.Title level={3}>远程主机</Typography.Title>
           <Flex gap={16} vertical>
             {knownHostTiles}
           </Flex>
@@ -374,7 +374,7 @@ const MultihostSummary = ({
       ) : null}
       {authorizedClientTiles.length > 0 ? (
         <>
-          <Typography.Title level={3}>Remote Clients</Typography.Title>
+          <Typography.Title level={3}>远程客户端</Typography.Title>
           <Flex gap={16} vertical>
             {authorizedClientTiles}
           </Flex>
@@ -422,17 +422,17 @@ const PeerStateTile = ({ peerState }: { peerState: PeerState }) => {
         items={[
           {
             key: 1,
-            label: "Instance ID",
+            label: "实例 ID",
             children: peerState.peerInstanceId,
           },
           {
             key: 2,
-            label: "Public Key ID",
+            label: "公共密钥 ID",
             children: peerState.peerKeyid,
           },
           {
             key: 3,
-            label: "Last State Update",
+            label: "最后状态更新",
             children: (
               <TimeSinceLastHeartbeat
                 lastHeartbeatMillis={Number(peerState.lastHeartbeatMillis)}
@@ -462,6 +462,6 @@ const TimeSinceLastHeartbeat = ({
   }, [lastHeartbeatMillis]);
 
   return (
-    formatTime(lastHeartbeatMillis) + " (" + formatDuration(timeSince) + " ago)"
+    formatTime(lastHeartbeatMillis) + " (" + formatDuration(timeSince) + " 之前)"
   );
 };

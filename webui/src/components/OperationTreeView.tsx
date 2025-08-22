@@ -508,7 +508,7 @@ const DisplayOperationTree = ({
           );
         }
         return (
-          <span>错误: 此元素不应当出现，请报告这个BUG</span>
+          <span>错误: 此元素不应当出现，请报告这个 BUG</span>
         );
       }}
     />
