@@ -40,7 +40,6 @@ export const OperationIcon = ({
       break;
     case DisplayType.CHECK:
       avatar = <FileSearchOutlined style={{ color: color }} />;
-      break;
     case DisplayType.RUNHOOK:
       avatar = <RobotOutlined style={{ color: color }} />;
       break;
