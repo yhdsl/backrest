@@ -21,7 +21,7 @@ const subscribers: ((event?: OperationEvent, err?: Error) => void)[] = [];
         subscribers.forEach((subscriber) => subscriber(event, undefined));
       }
     } catch (e: any) {
-      console.error("操作流由于异常而中止: ", e);
+      console.warn("操作流由于异常而中止: ", e);
     }
     await new Promise((accept, _) =>
       setTimeout(accept, nextConnWaitUntil - new Date().getTime()),
