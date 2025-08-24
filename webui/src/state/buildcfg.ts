@@ -6,4 +6,4 @@ export const uiBuildVersion = (
 export const isDevBuild = uiBuildVersion === "dev-snapshot-build";
 export const pathSeparator = isWindows ? "\\" : "/";
 export const backendUrl = process.env.UI_BACKEND_URL || "./";
-console.log(`UI OS: ${uios}, 构建版本: ${uiBuildVersion}, Backend URL: ${backendUrl}`);
+console.log(`UI OS: ${uios}, 构建版本: ${uiBuildVersion}, 后端 URL: ${backendUrl}`);
