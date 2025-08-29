@@ -25,7 +25,7 @@ func forwardResticLogs(ctx context.Context) (context.Context, func()) {
 		buf := make([]byte, 1024 * 1024)
 		scanner.Buffer(buf, 1024 * 1024)
 		for scanner.Scan() {
-			logger.Sugar().Infof("%s", scanner.Text())
+			logger.Sugar().Debugf("%s", scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
 			logger.Sugar().Errorf("Error reading restic logs: %v", err)
@@ -36,7 +36,7 @@ func forwardResticLogs(ctx context.Context) (context.Context, func()) {
 	limitWriter := &ioutil.LimitWriter{W: pw, N: 1024 * 1024}
 	return restic.ContextWithLogger(ctx, limitWriter), func() {
 		if limitWriter.D > 0 {
-			logger.Sugar().Warnf("... Output truncated, %d bytes dropped\n", limitWriter.D)
+			logger.Sugar().Debugf("... Output truncated, %d bytes dropped\n", limitWriter.D)
 		}
 		pw.Close()
 	}
