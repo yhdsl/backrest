@@ -241,7 +241,7 @@ const FileNode = ({
             snapshotOpId
               ? {
                   key: "download",
-                  label: "Download",
+                  label: "下载",
                   onClick: () => {
                     backrestService
                       .getDownloadURL({ value: snapshotOpId })
@@ -249,7 +249,7 @@ const FileNode = ({
                         window.open(resp.value + entry.path, "_blank");
                       })
                       .catch((e) => {
-                        alert("Failed to fetch download URL: " + e.message);
+                        alert("获取下载链接时出错: " + e.message);
                       });
                   },
                 }
