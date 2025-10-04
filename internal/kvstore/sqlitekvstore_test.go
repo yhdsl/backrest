@@ -2,30 +2,22 @@ package kvstore
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"strings"
 	"testing"
 
-	"zombiezen.com/go/sqlite/sqlitex"
+	_ "github.com/ncruces/go-sqlite3/driver"
+	"github.com/ncruces/go-sqlite3/vfs/memdb"
 )
 
-func newTestDB(t testing.TB) *sqlitex.Pool {
-	file := t.TempDir() + "/test.db"
-
-	// Using a named in-memory database "file:test.db?mode=memory&cache=shared"
-	// ensures that all connections in the pool share the same database.
-	dbpool, err := sqlitex.NewPool("file:"+file+"?mode=memory&cache=shared", sqlitex.PoolOptions{
-		PoolSize: 10,
-	})
+func newTestDB(t testing.TB) *sql.DB {
+	t.Helper()
+	db, err := sql.Open("sqlite3", memdb.TestDB(t))
 	if err != nil {
 		t.Fatalf("failed to open memory database: %v", err)
 	}
-	t.Cleanup(func() {
-		if err := dbpool.Close(); err != nil {
-			t.Logf("failed to close dbpool: %v", err)
-		}
-	})
-	return dbpool
+	return db
 }
 
 func TestSqliteKvStore(t *testing.T) {
@@ -37,8 +29,8 @@ func TestSqliteKvStore(t *testing.T) {
 
 	t.Run("Get non-existent", func(t *testing.T) {
 		value, err := store.Get("non-existent")
-		if err != nil {
-			t.Fatal(err)
+		if err != ErrNotExist {
+			t.Errorf("expected ErrNotExist, got %v", err)
 		}
 		if value != nil {
 			t.Errorf("expected nil, got %v", value)

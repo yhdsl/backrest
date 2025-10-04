@@ -1,6 +1,8 @@
 package sqlitestore
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
 	v1 "github.com/garethgeorge/backrest/gen/go/v1"
@@ -11,6 +13,7 @@ import (
 )
 
 func TestNewSqliteStore(t *testing.T) {
+	t.Parallel()
 	tempDir := t.TempDir()
 	store, err := NewSqliteStore(tempDir + "/test.sqlite")
 	if err != nil {
@@ -20,52 +23,36 @@ func TestNewSqliteStore(t *testing.T) {
 }
 
 func TestMigrateExisting(t *testing.T) {
+	t.Parallel()
 	tempDir := t.TempDir()
+	dbPath := tempDir + "/test.sqlite"
 
-	testOps := []*v1.Operation{}
+	testOps := make([]*v1.Operation, 0, 10)
 	for i := 0; i < 10; i++ {
 		testOps = append(testOps, testutil.RandomOperation())
 	}
 
-	store, err := NewSqliteStore(tempDir + "/test.sqlite")
+	store, err := NewSqliteStore(dbPath)
 	if err != nil {
 		t.Fatalf("error creating sqlite store: %s", err)
 	}
-
-	// insert some test data
 	if err := store.Add(testOps...); err != nil {
 		t.Fatalf("error adding test data: %s", err)
 	}
 
-	gotOps := make([]*v1.Operation, 0)
-	if err := store.Query(oplog.Query{}, func(op *v1.Operation) error {
-		gotOps = append(gotOps, op)
-		return nil
-	}); err != nil {
-		t.Fatalf("error querying sqlite store: %s", err)
-	}
-
-	if len(gotOps) != len(testOps) {
-		t.Errorf("first check before migrations, expected %d operations, got %d", len(testOps), len(gotOps))
-	}
+	setSchemaVersion(t, store, 192393)
 
 	if err := store.Close(); err != nil {
 		t.Fatalf("error closing sqlite store: %s", err)
 	}
 
-	// re-open the store
-	store2, err := NewSqliteStore(tempDir + "/test.sqlite")
+	store2, err := NewSqliteStore(dbPath)
 	if err != nil {
 		t.Fatalf("error creating sqlite store: %s", err)
 	}
+	defer store2.Close()
 
-	gotOps = gotOps[:0]
-	if err := store2.Query(oplog.Query{}, func(op *v1.Operation) error {
-		gotOps = append(gotOps, op)
-		return nil
-	}); err != nil {
-		t.Fatalf("error querying sqlite store: %s", err)
-	}
+	gotOps := queryAllOperations(t, store2)
 
 	if len(gotOps) != len(testOps) {
 		t.Errorf("expected %d operations, got %d", len(testOps), len(gotOps))
@@ -75,8 +62,37 @@ func TestMigrateExisting(t *testing.T) {
 		&v1.OperationList{Operations: gotOps},
 		&v1.OperationList{Operations: testOps},
 		protocmp.Transform()); diff != "" {
-		t.Errorf("unexpected diff in operations back after migration: %v", diff)
+		t.Errorf("unexpected diff in operations after migration: %v", diff)
 	}
 
-	t.Cleanup(func() { store2.Close() })
+	verifySchemaVersion(t, store2)
+}
+
+func setSchemaVersion(t *testing.T, store *SqliteStore, version int) {
+	_, err := store.dbpool.ExecContext(context.Background(), fmt.Sprintf("PRAGMA user_version = %d", version))
+	if err != nil {
+		t.Fatalf("error setting user_version: %s", err)
+	}
+}
+
+func queryAllOperations(t *testing.T, store *SqliteStore) []*v1.Operation {
+	gotOps := make([]*v1.Operation, 0)
+	if err := store.Query(oplog.Query{}, func(op *v1.Operation) error {
+		gotOps = append(gotOps, op)
+		return nil
+	}); err != nil {
+		t.Fatalf("error querying sqlite store: %s", err)
+	}
+	return gotOps
+}
+
+func verifySchemaVersion(t *testing.T, store *SqliteStore) {
+	var version int
+	err := store.dbpool.QueryRowContext(context.Background(), "PRAGMA user_version").Scan(&version)
+	if err != nil {
+		t.Fatalf("error verifying user_version: %s", err)
+	}
+	if version != sqlSchemaVersion {
+		t.Fatalf("expected user_version %d, got %d", sqlSchemaVersion, version)
+	}
 }

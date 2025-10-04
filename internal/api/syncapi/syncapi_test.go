@@ -2,6 +2,7 @@ package syncapi
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -22,13 +23,12 @@ import (
 	"github.com/garethgeorge/backrest/internal/resticinstaller"
 	"github.com/garethgeorge/backrest/internal/testutil"
 	"github.com/google/go-cmp/cmp"
+	"github.com/ncruces/go-sqlite3/vfs/memdb"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
-	"zombiezen.com/go/sqlite"
-	"zombiezen.com/go/sqlite/sqlitex"
 )
 
 const (
@@ -716,7 +716,7 @@ func newPeerUnderTest(t *testing.T, initialConfig *v1.Config) *peerUnderTest {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	configMgr := &config.ConfigManager{Store: &config.MemoryStore{Config: initialConfig}}
-	opstore, err := sqlitestore.NewMemorySqliteStore()
+	opstore, err := sqlitestore.NewMemorySqliteStore(t)
 	t.Cleanup(func() { opstore.Close() })
 	if err != nil {
 		t.Fatalf("failed to create opstore: %v", err)
@@ -749,12 +749,9 @@ func newPeerUnderTest(t *testing.T, initialConfig *v1.Config) *peerUnderTest {
 		wg.Done()
 	}()
 
-	dbpool, err := sqlitex.NewPool("file:"+cryptoutil.MustRandomID(64)+"?mode=memory&cache=shared", sqlitex.PoolOptions{
-		PoolSize: 16,
-		Flags:    sqlite.OpenReadWrite | sqlite.OpenCreate | sqlite.OpenURI,
-	})
+	dbpool, err := sql.Open("sqlite3", memdb.TestDB(t))
 	if err != nil {
-		t.Fatalf("error creating sqlite pool: %s", err)
+		t.Fatalf("failed to open sqlite pool: %v", err)
 	}
 
 	t.Cleanup(func() {

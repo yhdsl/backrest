@@ -90,14 +90,33 @@ export const SnapshotBrowser = ({
   repoId,
   planId, // optional: purely to link restore operations to the right plan.
   snapshotId,
+  snapshotOpId,
 }: React.PropsWithoutRef<{
   snapshotId: string;
+  snapshotOpId?: bigint;
   repoId: string;
   planId?: string;
 }>) => {
   const alertApi = useAlertApi();
   const showModal = useShowModal();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
+
+  const respToNodes = (resp: ListSnapshotFilesResponse): DataNode[] => {
+    const nodes = resp
+      .entries!.filter((entry) => entry.path!.length >= resp.path!.length)
+      .map((entry) => {
+        const node: DataNode = {
+          key: entry.path!,
+          title: <FileNode entry={entry} snapshotOpId={snapshotOpId} />,
+          isLeaf: entry.type === "file",
+          icon: entry.type === "file" ? <FileOutlined /> : <FolderOutlined />,
+        };
+        return node;
+      });
+
+    nodes.sort(compareFn);
+    return nodes;
+  };
 
   useEffect(() => {
     setTreeData(
@@ -146,7 +165,7 @@ export const SnapshotBrowser = ({
       }
 
       const toUpdateCopy = { ...toUpdate };
-      toUpdateCopy.children = respToNodes(resp);
+      toUpdateCopy.children = respToNodes(resp, snapshotOpId);
 
       return treeData.map((node) => {
         const didUpdate = replaceKeyInTree(node, key as string, toUpdateCopy);
@@ -167,24 +186,13 @@ export const SnapshotBrowser = ({
   );
 };
 
-const respToNodes = (resp: ListSnapshotFilesResponse): DataNode[] => {
-  const nodes = resp
-    .entries!.filter((entry) => entry.path!.length >= resp.path!.length)
-    .map((entry) => {
-      const node: DataNode = {
-        key: entry.path!,
-        title: <FileNode entry={entry} />,
-        isLeaf: entry.type === "file",
-        icon: entry.type === "file" ? <FileOutlined /> : <FolderOutlined />,
-      };
-      return node;
-    });
-
-  nodes.sort(compareFn);
-  return nodes;
-};
-
-const FileNode = ({ entry }: { entry: LsEntry }) => {
+const FileNode = ({
+  entry,
+  snapshotOpId,
+}: {
+  entry: LsEntry;
+  snapshotOpId?: bigint;
+}) => {
   const [dropdown, setDropdown] = useState<React.ReactNode>(null);
   const { snapshotId, repoId, planId, showModal } = React.useContext(
     SnapshotBrowserContext
@@ -230,6 +238,22 @@ const FileNode = ({ entry }: { entry: LsEntry }) => {
                   );
                 },
               },
+            snapshotOpId
+              ? {
+                  key: "download",
+                  label: "Download",
+                  onClick: () => {
+                    backrestService
+                      .getDownloadURL({ value: snapshotOpId })
+                      .then((resp) => {
+                        window.open(resp.value + entry.path, "_blank");
+                      })
+                      .catch((e) => {
+                        alert("Failed to fetch download URL: " + e.message);
+                      });
+                  },
+                }
+              : null,
             ],
           }}
       >
