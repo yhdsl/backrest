@@ -246,7 +246,15 @@ const FileNode = ({
                     backrestService
                       .getDownloadURL({ value: snapshotOpId })
                       .then((resp) => {
-                        window.open(resp.value + entry.path, "_blank");
+                        const encodePathKeepSlashes = (p: string) =>
+                          p
+                            .split("/")
+                            .map((seg) => encodeURIComponent(seg))
+                            .join("/");
+                        window.open(
+                          resp.value + encodePathKeepSlashes(entry.path!),
+                          "_blank"
+                        );
                       })
                       .catch((e) => {
                         alert("获取下载链接时出错: " + e.message);
