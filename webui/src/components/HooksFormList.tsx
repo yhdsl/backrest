@@ -407,21 +407,21 @@ const hookTypes: {
         <>
           <Form.Item
             name={[field.name, "actionTelegram", "botToken"]}
-            rules={[requiredField("bot token is required")]}
+            rules={[requiredField("bot token 为必填项")]}
           >
             <Input
               addonBefore={
                 <Tooltip
                   title={
                     <>
-                      Create a bot with{" "}
+                      使用{" "}
                       <a
                         href="https://t.me/botfather"
                         target="_blank"
                       >
                         @BotFather
                       </a>{" "}
-                      and use the token provided
+                      创建一个 Telegram bot，并在此填写提供的 bot token
                     </>
                   }
                 >
@@ -432,21 +432,21 @@ const hookTypes: {
           </Form.Item>
           <Form.Item
             name={[field.name, "actionTelegram", "chatId"]}
-            rules={[requiredField("chat ID is required")]}
+            rules={[requiredField("chat ID 为必填项")]}
           >
             <Input
               addonBefore={
                 <Tooltip
                   title={
                     <>
-                      Chat ID can be a user ID, group ID, or channel ID. Use{" "}
+                      Chat ID 可以是一个用户ID，聊天组ID，或者频道ID。使用{" "}
                       <a
                         href="https://t.me/userinfobot"
                         target="_blank"
                       >
                         @userinfobot
                       </a>{" "}
-                      to find your user ID
+                      来获取你个人的用户ID
                     </>
                   }
                 >
@@ -455,7 +455,7 @@ const hookTypes: {
               }
             />
           </Form.Item>
-          Text Template:
+          文本模板:
           <Form.Item name={[field.name, "actionTelegram", "template"]}>
             <Input.TextArea
               style={{ width: "100%", fontFamily: "monospace" }}
