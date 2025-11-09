@@ -7,7 +7,7 @@
 package v1
 
 import (
-	types "github.com/garethgeorge/backrest/gen/go/types"
+	types "github.com/yhdsl/backrest/gen/go/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -132,7 +132,7 @@ const file_v1_authentication_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token2z\n" +
 	"\x0eAuthentication\x12.\n" +
 	"\x05Login\x12\x10.v1.LoginRequest\x1a\x11.v1.LoginResponse\"\x00\x128\n" +
-	"\fHashPassword\x12\x12.types.StringValue\x1a\x12.types.StringValue\"\x00B,Z*github.com/garethgeorge/backrest/gen/go/v1b\x06proto3"
+	"\fHashPassword\x12\x12.types.StringValue\x1a\x12.types.StringValue\"\x00B,Z*github.com/yhdsl/backrest/gen/go/v1b\x06proto3"
 
 var (
 	file_v1_authentication_proto_rawDescOnce sync.Once

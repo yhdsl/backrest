@@ -1,6 +1,6 @@
 package oplog
 
-import v1 "github.com/garethgeorge/backrest/gen/go/v1"
+import v1 "github.com/yhdsl/backrest/gen/go/v1"
 
 type Query struct {
 	// Filter by fields

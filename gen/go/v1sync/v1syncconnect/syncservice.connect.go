@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1sync "github.com/garethgeorge/backrest/gen/go/v1sync"
+	v1sync "github.com/yhdsl/backrest/gen/go/v1sync"
 	http "net/http"
 	strings "strings"
 )

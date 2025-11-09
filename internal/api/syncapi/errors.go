@@ -3,7 +3,7 @@ package syncapi
 import (
 	"fmt"
 
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
 )
 
 type SyncError struct {

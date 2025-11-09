@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/config"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/config"
 )
 
 func TestLogin(t *testing.T) {

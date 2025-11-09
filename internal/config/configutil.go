@@ -1,7 +1,7 @@
 package config
 
 import (
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 )
 
 func FindPlan(cfg *v1.Config, planID string) *v1.Plan {

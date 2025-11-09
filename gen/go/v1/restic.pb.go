@@ -937,7 +937,7 @@ const file_v1_restic_proto_rawDesc = "" +
 	"\x17total_uncompressed_size\x18\x02 \x01(\x03R\x15totalUncompressedSize\x12+\n" +
 	"\x11compression_ratio\x18\x03 \x01(\x01R\x10compressionRatio\x12(\n" +
 	"\x10total_blob_count\x18\x05 \x01(\x03R\x0etotalBlobCount\x12%\n" +
-	"\x0esnapshot_count\x18\x06 \x01(\x03R\rsnapshotCountB,Z*github.com/garethgeorge/backrest/gen/go/v1b\x06proto3"
+	"\x0esnapshot_count\x18\x06 \x01(\x03R\rsnapshotCountB,Z*github.com/yhdsl/backrest/gen/go/v1b\x06proto3"
 
 var (
 	file_v1_restic_proto_rawDescOnce sync.Once

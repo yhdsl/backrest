@@ -13,9 +13,9 @@ import (
 	"strings"
 	"testing"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/test/helpers"
-	test "github.com/garethgeorge/backrest/test/helpers"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/test/helpers"
+	test "github.com/yhdsl/backrest/test/helpers"
 	"golang.org/x/sync/errgroup"
 )
 

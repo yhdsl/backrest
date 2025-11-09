@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
-	"github.com/garethgeorge/backrest/internal/config"
-	"github.com/garethgeorge/backrest/internal/cryptoutil"
-	"github.com/garethgeorge/backrest/internal/oplog"
-	"github.com/garethgeorge/backrest/internal/orchestrator"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/internal/config"
+	"github.com/yhdsl/backrest/internal/cryptoutil"
+	"github.com/yhdsl/backrest/internal/oplog"
+	"github.com/yhdsl/backrest/internal/orchestrator"
 	"go.uber.org/zap"
 )
 

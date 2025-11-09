@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 )
 
 func NewOneoffForgetSnapshotTask(repo *v1.Repo, planID string, flowID int64, at time.Time, snapshotID string) Task {

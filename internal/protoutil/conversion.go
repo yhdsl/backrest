@@ -3,8 +3,8 @@ package protoutil
 import (
 	"errors"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/pkg/restic"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/pkg/restic"
 )
 
 func SnapshotToProto(s *restic.Snapshot) *v1.ResticSnapshot {

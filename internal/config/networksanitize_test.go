@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/testing/protocmp"
 )

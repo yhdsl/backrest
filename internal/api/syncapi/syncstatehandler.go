@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
-	"github.com/garethgeorge/backrest/gen/go/v1sync/v1syncconnect"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/gen/go/v1sync/v1syncconnect"
 )
 
 type BackrestSyncStateHandler struct {

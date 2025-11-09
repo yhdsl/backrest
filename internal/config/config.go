@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/config/migrations"
-	"github.com/garethgeorge/backrest/internal/cryptoutil"
-	"github.com/garethgeorge/backrest/internal/eventemitter"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/config/migrations"
+	"github.com/yhdsl/backrest/internal/cryptoutil"
+	"github.com/yhdsl/backrest/internal/eventemitter"
 	"go.uber.org/zap"
 )
 

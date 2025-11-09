@@ -17,9 +17,9 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/oplog"
-	"github.com/garethgeorge/backrest/internal/orchestrator"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/oplog"
+	"github.com/yhdsl/backrest/internal/orchestrator"
 	"go.uber.org/zap"
 )
 

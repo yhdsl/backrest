@@ -6,8 +6,8 @@ import (
 	"encoding/binary"
 	"sync/atomic"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/cryptoutil"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/cryptoutil"
 	"google.golang.org/protobuf/proto"
 )
 

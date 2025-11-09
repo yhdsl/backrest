@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/garethgeorge/backrest/test/helpers"
+	"github.com/yhdsl/backrest/test/helpers"
 )
 
 func TestResticInit(t *testing.T) {

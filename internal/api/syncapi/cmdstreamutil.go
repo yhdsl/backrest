@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
 )
 
 type syncCommandStreamTrait interface {

@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
-	"github.com/garethgeorge/backrest/internal/config"
-	"github.com/garethgeorge/backrest/internal/cryptoutil"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/internal/config"
+	"github.com/yhdsl/backrest/internal/cryptoutil"
 	"google.golang.org/protobuf/proto"
 )
 

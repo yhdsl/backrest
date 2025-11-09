@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 )
 
 // TestApplyHookErrorPolicy tests that applyHookErrorPolicy is defined for all values of Hook_OnError.

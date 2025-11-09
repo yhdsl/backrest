@@ -222,7 +222,7 @@ const file_v1_crypto_proto_rawDesc = "" +
 	"\ved25519priv\x18\x02 \x01(\tR\ved25519priv\x12\x1e\n" +
 	"\n" +
 	"ed25519pub\x18\x03 \x01(\tR\n" +
-	"ed25519pubB,Z*github.com/garethgeorge/backrest/gen/go/v1b\x06proto3"
+	"ed25519pubB,Z*github.com/yhdsl/backrest/gen/go/v1b\x06proto3"
 
 var (
 	file_v1_crypto_proto_rawDescOnce sync.Once
