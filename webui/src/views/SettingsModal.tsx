@@ -34,6 +34,7 @@ import {
 import { PeerState } from "../../gen/ts/v1sync/syncservice_pb";
 import { useSyncStates } from "../state/peerstates";
 import { PeerStateConnectionStatusIcon } from "../components/SyncStateIcon";
+import { isMultihostSyncEnabled } from "../state/buildcfg";
 
 interface FormData {
   auth: {
@@ -211,7 +212,7 @@ export const SettingsModal = () => {
                     peerStates={peerStates}
                   />
                 ),
-                // style: { display: "none" },
+                style: isMultihostSyncEnabled ? undefined : { display: "none" },
               },
               {
                 key: "last",

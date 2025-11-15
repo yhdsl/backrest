@@ -12,6 +12,7 @@ import {
   Col,
   Collapse,
   Checkbox,
+  AutoComplete,
 } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { useShowModal } from "../components/ModalManager";
@@ -44,6 +45,101 @@ import {
 import { clone, create, equals, fromJson, toJson } from "@bufbuild/protobuf";
 import { formatDuration } from "../lib/formatting";
 import { getMinimumCronDuration } from "../lib/cronutil";
+import _ from "lodash";
+import { StringList } from "../../gen/ts/types/value_pb";
+import { isWindows } from "../state/buildcfg";
+
+const { TextArea } = Input;
+const sep = isWindows ? "\\" : "/";
+
+const PathsTextArea = ({ value, onChange, ...props }: any) => {
+  const [options, setOptions] = useState<{ value: string }[]>([]);
+  const [currentLine, setCurrentLine] = useState("");
+  const [cursorPosition, setCursorPosition] = useState(0);
+
+  const handleSearch = _.debounce((searchValue: string) => {
+    if (!searchValue) {
+      setOptions([]);
+      return;
+    }
+
+    const lastSlash = searchValue.lastIndexOf(sep);
+    let searchPath = searchValue;
+    if (lastSlash !== -1) {
+      searchPath = searchValue.substring(0, lastSlash);
+    }
+
+    backrestService
+      .pathAutocomplete({ value: searchPath + sep })
+      .then((res: StringList) => {
+        if (!res.values) {
+          return;
+        }
+        const vals = res.values.map((v) => {
+          return {
+            value: searchPath + sep + v,
+          };
+        });
+        setOptions(vals.filter((o) => o.value.indexOf(searchValue) !== -1));
+      })
+      .catch((e) => {
+        console.log("路径自动补全错误: ", e);
+      });
+  }, 200);
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    const cursorPos = e.target.selectionStart || 0;
+
+    // Find the current line based on cursor position
+    const lines = newValue.substring(0, cursorPos).split("\n");
+    const currentLineValue = lines[lines.length - 1];
+
+    setCurrentLine(currentLineValue);
+    setCursorPosition(cursorPos);
+
+    // Trigger autocomplete for the current line
+    handleSearch(currentLineValue);
+
+    // Update the form value
+    if (onChange) {
+      onChange(newValue);
+    }
+  };
+
+  const onSelect = (selectedValue: string) => {
+    const lines = (value || "").split("\n");
+    const beforeCursor = (value || "").substring(0, cursorPosition);
+    const afterCursor = (value || "").substring(cursorPosition);
+    const linesBeforeCursor = beforeCursor.split("\n");
+
+    // Replace the current line with the selected value
+    linesBeforeCursor[linesBeforeCursor.length - 1] = selectedValue;
+    const newValue = linesBeforeCursor.join("\n") + afterCursor;
+
+    if (onChange) {
+      onChange(newValue);
+    }
+    setOptions([]);
+  };
+
+  return (
+    <AutoComplete
+      options={options}
+      onSelect={onSelect}
+      onSearch={() => {}} // We handle search in textarea change
+      {...props}
+    >
+      <TextArea
+        value={value}
+        onChange={handleTextAreaChange}
+        placeholder="请输入路径，每行输入一个路径&#10;例如&#10;/home/user/documents&#10;/home/user/photos"
+        style={{ minHeight: 100 }}
+        autoSize={{ minRows: 3, maxRows: 10 }}
+      />
+    </AutoComplete>
+  );
+};
 
 const planDefaults = create(PlanSchema, {
   schedule: {
@@ -72,11 +168,19 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
   const [config, setConfig] = useConfig();
   const [form] = Form.useForm();
   useEffect(() => {
-    form.setFieldsValue(
-      template
-        ? toJson(PlanSchema, template, { alwaysEmitImplicit: true })
-        : toJson(PlanSchema, planDefaults, { alwaysEmitImplicit: true })
-    );
+    const formData = template
+      ? toJson(PlanSchema, template, { alwaysEmitImplicit: true })
+      : toJson(PlanSchema, planDefaults, { alwaysEmitImplicit: true });
+
+    // Convert paths array to newline-separated string for the textarea
+    const formDataObj = formData as any;
+    if (formDataObj?.paths && Array.isArray(formDataObj.paths)) {
+      formDataObj.pathsText = formDataObj.paths.join("\n");
+    } else {
+      formDataObj.pathsText = "";
+    }
+
+    form.setFieldsValue(formDataObj);
   }, [template]);
 
   if (!config) {
@@ -120,6 +224,18 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
 
     try {
       let planFormData = await validateForm(form);
+
+      // Convert pathsText back to paths array
+      if (planFormData.pathsText) {
+        planFormData.paths = planFormData.pathsText
+          .split("\n")
+          .map((path: string) => path.trim())
+          .filter((path: string) => path.length > 0);
+        delete planFormData.pathsText;
+      } else {
+        planFormData.paths = [];
+      }
+
       const plan = fromJson(PlanSchema, planFormData, {
         ignoreUnknownFields: false,
       });
@@ -270,57 +386,31 @@ export const AddPlanModal = ({ template }: { template: Plan | null }) => {
           </Form.Item>
 
           {/* Plan.paths */}
-          <Form.Item label="路径" required={true}>
-            <Form.List
-              name="paths"
-              rules={[]}
-              initialValue={template ? template.paths : []}
-            >
-              {(fields, { add, remove }, { errors }) => (
-                <>
-                  {fields.map((field, index) => {
-                    const { key, ...restField } = field;
-                    return (
-                      <Form.Item key={field.key}>
-                        <Form.Item
-                          {...restField}
-                          validateTrigger={["onChange", "onBlur"]}
-                          initialValue={""}
-                          rules={[
-                            {
-                              required: true,
-                              message: "请输入路径地址",
-                            },
-                          ]}
-                          noStyle
-                        >
-                          <URIAutocomplete
-                            style={{ width: "90%" }}
-                            onBlur={() => form.validateFields()}
-                          />
-                        </Form.Item>
-                        <MinusCircleOutlined
-                          className="dynamic-delete-button"
-                          onClick={() => remove(field.name)}
-                          style={{ paddingLeft: "5px" }}
-                        />
-                      </Form.Item>
+          <Form.Item
+            name="pathsText"
+            label="路径"
+            required={true}
+            tooltip="请输入需要备份的文件路径，每行一个。输入时可使用自动补齐功能。"
+            rules={[
+              {
+                validator: async (_, value) => {
+                  if (!value || !value.trim()) {
+                    throw new Error("请输入至少一个路径以进行备份");
+                  }
+                  const paths = value
+                    .split("\n")
+                    .map((p: string) => p.trim())
+                    .filter((p: string) => p.length > 0);
+                  if (paths.length === 0) {
+                    throw new Error(
+                      "请输入至少一个有效的路径以进行备份"
                     );
-                  })}
-                  <Form.Item>
-                    <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      style={{ width: "90%" }}
-                      icon={<PlusOutlined />}
-                    >
-                      添加路径
-                    </Button>
-                    <Form.ErrorList errors={errors} />
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
+                  }
+                },
+              },
+            ]}
+          >
+            <PathsTextArea />
           </Form.Item>
 
           {/* Plan.excludes */}

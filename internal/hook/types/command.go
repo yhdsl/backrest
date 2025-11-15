@@ -14,6 +14,7 @@ import (
 	"github.com/yhdsl/backrest/internal/ioutil"
 	"github.com/yhdsl/backrest/internal/orchestrator/logging"
 	"github.com/yhdsl/backrest/internal/orchestrator/tasks"
+	"github.com/yhdsl/backrest/internal/platformutil"
 	"github.com/google/shlex"
 )
 
@@ -59,6 +60,7 @@ func (commandHandler) Execute(ctx context.Context, h *v1.Hook, vars interface{},
 
 	// Run the command in the specified shell
 	execCmd := exec.Command(shell[0], shell[1:]...)
+	platformutil.SetPlatformOptions(execCmd)
 	execCmd.Stdin = strings.NewReader(command)
 
 	stdout := &ioutil.SynchronizedWriter{W: outputWriter}
