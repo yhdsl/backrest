@@ -17,8 +17,8 @@ import (
 
 	"github.com/djherbis/buffer"
 	nio "github.com/djherbis/nio/v3"
-	"github.com/garethgeorge/backrest/internal/ioutil"
-	"github.com/garethgeorge/backrest/internal/platformutil"
+	"github.com/yhdsl/backrest/internal/ioutil"
+	"github.com/yhdsl/backrest/internal/platformutil"
 	"go.uber.org/zap"
 )
 
