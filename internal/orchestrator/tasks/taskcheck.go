@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/oplog"
-	"github.com/garethgeorge/backrest/internal/protoutil"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/oplog"
+	"github.com/yhdsl/backrest/internal/protoutil"
 )
 
 type CheckTask struct {

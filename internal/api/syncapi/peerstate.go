@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/garethgeorge/backrest/gen/go/v1sync"
-	"github.com/garethgeorge/backrest/internal/eventemitter"
-	"github.com/garethgeorge/backrest/internal/kvstore"
+	"github.com/yhdsl/backrest/gen/go/v1sync"
+	"github.com/yhdsl/backrest/internal/eventemitter"
+	"github.com/yhdsl/backrest/internal/kvstore"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )

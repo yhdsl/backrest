@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"al.essio.dev/pkg/shellescape"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/pkg/restic"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/pkg/restic"
 )
 
 // HookVars is the set of variables that are available to a hook. Some of these are optional.

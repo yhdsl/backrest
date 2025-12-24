@@ -3,8 +3,8 @@ package oplog
 import (
 	"fmt"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/ioutil"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/ioutil"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"reflect"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/orchestrator/tasks"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/orchestrator/tasks"
 )
 
 var ErrHandlerNotFound = errors.New("handler not found")

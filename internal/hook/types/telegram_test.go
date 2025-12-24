@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 )
 
 func TestTelegramHandlerRegistration(t *testing.T) {

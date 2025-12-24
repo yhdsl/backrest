@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )

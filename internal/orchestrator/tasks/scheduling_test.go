@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/internal/config"
-	"github.com/garethgeorge/backrest/internal/cryptoutil"
-	"github.com/garethgeorge/backrest/internal/oplog"
-	"github.com/garethgeorge/backrest/internal/oplog/sqlitestore"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/internal/config"
+	"github.com/yhdsl/backrest/internal/cryptoutil"
+	"github.com/yhdsl/backrest/internal/oplog"
+	"github.com/yhdsl/backrest/internal/oplog/sqlitestore"
 )
 
 func TestScheduling(t *testing.T) {

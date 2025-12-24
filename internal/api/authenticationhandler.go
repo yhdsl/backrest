@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	"github.com/garethgeorge/backrest/gen/go/types"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/gen/go/v1/v1connect"
-	"github.com/garethgeorge/backrest/internal/auth"
+	"github.com/yhdsl/backrest/gen/go/types"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/gen/go/v1/v1connect"
+	"github.com/yhdsl/backrest/internal/auth"
 	"go.uber.org/zap"
 )
 
