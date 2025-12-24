@@ -7,3 +7,5 @@ cmd/backrest/backrest
 .idea/
 .pnpm-store/
 webui/dist-backup/
+webui/node_modules
+webui/package-lock.json
