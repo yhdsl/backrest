@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/garethgeorge/backrest/gen/go/types"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
-	"github.com/garethgeorge/backrest/gen/go/v1/v1connect"
-	"github.com/garethgeorge/backrest/internal/testutil"
+	"github.com/yhdsl/backrest/gen/go/types"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
+	"github.com/yhdsl/backrest/gen/go/v1/v1connect"
+	"github.com/yhdsl/backrest/internal/testutil"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
