@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/garethgeorge/backrest/internal/env"
+	"github.com/yhdsl/backrest/internal/env"
 	"github.com/getlantern/systray"
 	"github.com/ncruces/zenity"
 
