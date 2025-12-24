@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package types;
 
-option go_package = "github.com/garethgeorge/backrest/gen/go/types";
+option go_package = "github.com/yhdsl/backrest/gen/go/types";
 
 message BoolValue {
   bool value = 1;
