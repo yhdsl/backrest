@@ -1,4 +1,4 @@
-module github.com/garethgeorge/backrest
+module github.com/yhdsl/backrest
 
 go 1.24.0
 

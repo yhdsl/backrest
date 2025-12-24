@@ -79,124 +79,124 @@ archives:
       - CHANGELOG.md
     allow_different_binary_count: true
 
-dockers:
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-alpine-amd64
-    dockerfile: Dockerfile.alpine
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-    extra_files:
-      - ./
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-alpine-arm64
-    dockerfile: Dockerfile.alpine
-    goarch: arm64
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64/v8"
-    extra_files:
-      - ./
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-arm64
-    dockerfile: Dockerfile.scratch
-    goarch: arm64
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64/v8"
-    extra_files:
-      - ./
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-amd64
-    dockerfile: Dockerfile.scratch
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-    extra_files:
-      - ./
-
-  - image_templates:
-      - garethgeorge/backrest:{{ .Tag }}-scratch-armv6
-    dockerfile: Dockerfile.scratch
-    use: buildx
-    goarch: arm
-    goarm: 6
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm/v6"
-    extra_files:
-      - ./
-
-docker_manifests:
-  - name_template: "garethgeorge/backrest:latest"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:{{ .Tag }}"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:latest-alpine"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
-  - name_template: "garethgeorge/backrest:scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-  - name_template: "garethgeorge/backrest:{{ .Tag }}-scratch"
-    image_templates:
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
-      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
-
-brews:
-  - name: backrest
-    homepage: https://github.com/garethgeorge/backrest
-    description: "Backrest is a web UI and orchestrator for restic backup."
-
-    url_template: "https://github.com/garethgeorge/backrest/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-
-    repository:
-      owner: garethgeorge
-      name: homebrew-backrest-tap
-      branch: main
-      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
-
-    service: |
-      run opt_bin/"backrest"
-      error_log_path var/"log/backrest.log"
-      log_path var/"log/backrest.log"
+#dockers:
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-alpine-amd64
+#    dockerfile: Dockerfile.alpine
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/amd64"
+#    extra_files:
+#      - ./
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-alpine-arm64
+#    dockerfile: Dockerfile.alpine
+#    goarch: arm64
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm64/v8"
+#    extra_files:
+#      - ./
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-arm64
+#    dockerfile: Dockerfile.scratch
+#    goarch: arm64
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm64/v8"
+#    extra_files:
+#      - ./
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-amd64
+#    dockerfile: Dockerfile.scratch
+#    use: buildx
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/amd64"
+#    extra_files:
+#      - ./
+#
+#  - image_templates:
+#      - garethgeorge/backrest:{{ .Tag }}-scratch-armv6
+#    dockerfile: Dockerfile.scratch
+#    use: buildx
+#    goarch: arm
+#    goarm: 6
+#    build_flag_templates:
+#      - "--pull"
+#      - "--platform=linux/arm/v6"
+#    extra_files:
+#      - ./
+#
+#docker_manifests:
+#  - name_template: "garethgeorge/backrest:latest"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:{{ .Tag }}"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:latest-alpine"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-alpine-arm64"
+#  - name_template: "garethgeorge/backrest:scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:v{{ .Major }}.{{ .Minor }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#  - name_template: "garethgeorge/backrest:{{ .Tag }}-scratch"
+#    image_templates:
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-amd64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-arm64"
+#      - "garethgeorge/backrest:{{ .Tag }}-scratch-armv6"
+#
+#brews:
+#  - name: backrest
+#    homepage: https://github.com/garethgeorge/backrest
+#    description: "Backrest is a web UI and orchestrator for restic backup."
+#
+#    url_template: "https://github.com/garethgeorge/backrest/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#
+#    commit_author:
+#      name: goreleaserbot
+#      email: bot@goreleaser.com
+#
+#    repository:
+#      owner: garethgeorge
+#      name: homebrew-backrest-tap
+#      branch: main
+#      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
+#
+#    service: |
+#      run opt_bin/"backrest"
+#      error_log_path var/"log/backrest.log"
+#      log_path var/"log/backrest.log"
 
 changelog:
   sort: asc
@@ -207,5 +207,5 @@ changelog:
 
 release:
   github:
-    owner: garethgeorge
+    owner: yhdsl
     name: backrest
