@@ -7,7 +7,7 @@
 package v1
 
 import (
-	types "github.com/garethgeorge/backrest/gen/go/types"
+	types "github.com/yhdsl/backrest/gen/go/types"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1230,7 +1230,7 @@ const file_v1_operations_proto_rawDesc = "" +
 	"\x0eSTATUS_WARNING\x10\a\x12\x10\n" +
 	"\fSTATUS_ERROR\x10\x04\x12\x1b\n" +
 	"\x17STATUS_SYSTEM_CANCELLED\x10\x05\x12\x19\n" +
-	"\x15STATUS_USER_CANCELLED\x10\x06B,Z*github.com/garethgeorge/backrest/gen/go/v1b\x06proto3"
+	"\x15STATUS_USER_CANCELLED\x10\x06B,Z*github.com/yhdsl/backrest/gen/go/v1b\x06proto3"
 
 var (
 	file_v1_operations_proto_rawDescOnce sync.Once

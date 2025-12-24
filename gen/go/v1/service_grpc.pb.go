@@ -8,7 +8,7 @@ package v1
 
 import (
 	context "context"
-	types "github.com/garethgeorge/backrest/gen/go/types"
+	types "github.com/yhdsl/backrest/gen/go/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

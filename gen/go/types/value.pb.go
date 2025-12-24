@@ -341,7 +341,7 @@ const file_types_value_proto_rawDesc = "" +
 	"\x05value\x18\x01 \x01(\x03R\x05value\"#\n" +
 	"\tInt64List\x12\x16\n" +
 	"\x06values\x18\x01 \x03(\x03R\x06values\"\a\n" +
-	"\x05EmptyB/Z-github.com/garethgeorge/backrest/gen/go/typesb\x06proto3"
+	"\x05EmptyB/Z-github.com/yhdsl/backrest/gen/go/typesb\x06proto3"
 
 var (
 	file_types_value_proto_rawDescOnce sync.Once

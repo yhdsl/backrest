@@ -7,8 +7,8 @@
 package v1sync
 
 import (
-	_ "github.com/garethgeorge/backrest/gen/go/types"
-	v1 "github.com/garethgeorge/backrest/gen/go/v1"
+	_ "github.com/yhdsl/backrest/gen/go/types"
+	v1 "github.com/yhdsl/backrest/gen/go/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -1810,7 +1810,7 @@ const file_v1sync_syncservice_proto_rawDesc = "" +
 	"\x13BackrestSyncService\x12<\n" +
 	"\x04Sync\x12\x16.v1sync.SyncStreamItem\x1a\x16.v1sync.SyncStreamItem\"\x00(\x010\x012l\n" +
 	"\x18BackrestSyncStateService\x12P\n" +
-	"\x17GetPeerSyncStatesStream\x12\x1e.v1sync.SyncStateStreamRequest\x1a\x11.v1sync.PeerState\"\x000\x01B0Z.github.com/garethgeorge/backrest/gen/go/v1syncb\x06proto3"
+	"\x17GetPeerSyncStatesStream\x12\x1e.v1sync.SyncStateStreamRequest\x1a\x11.v1sync.PeerState\"\x000\x01B0Z.github.com/yhdsl/backrest/gen/go/v1syncb\x06proto3"
 
 var (
 	file_v1sync_syncservice_proto_rawDescOnce sync.Once

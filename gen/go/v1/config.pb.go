@@ -2434,7 +2434,7 @@ const file_v1_config_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12)\n" +
 	"\x0fpassword_bcrypt\x18\x02 \x01(\tH\x00R\x0epasswordBcryptB\n" +
 	"\n" +
-	"\bpasswordB,Z*github.com/garethgeorge/backrest/gen/go/v1b\x06proto3"
+	"\bpasswordB,Z*github.com/yhdsl/backrest/gen/go/v1b\x06proto3"
 
 var (
 	file_v1_config_proto_rawDescOnce sync.Once
