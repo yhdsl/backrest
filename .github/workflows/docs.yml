@@ -5,7 +5,7 @@ name: Docs
 
 on:
   push:
-    branches: ["main-old"]
+    branches: ["main_old"]
     paths:
       - "docs/**"
   workflow_dispatch:

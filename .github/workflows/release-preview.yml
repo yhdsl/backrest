@@ -2,12 +2,12 @@ name: Release Preview
 
 on:
   push:
-    branches: ["main-old"]
+    branches: ["main_old"]
     paths-ignore:
       - "docs/**"
       - "*.md"
   pull_request:
-    branches: ["main-old"]
+    branches: ["main_old"]
     paths-ignore:
       - "docs/**"
       - "*.md"
