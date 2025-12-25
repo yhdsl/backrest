@@ -26,8 +26,6 @@ import { StringValueSchema } from "../../gen/ts/types/value_pb";
 import { pathSeparator } from "../state/buildcfg";
 import { create, toJsonString } from "@bufbuild/protobuf";
 
-const collator = new Intl.Collator("en", {numeric: true, caseFirst: 'lower'});
-
 function compareFn(a: DataNode, b: DataNode) {
   if (a.isLeaf === true && b.isLeaf === false) {
     return 1;
@@ -36,7 +34,16 @@ function compareFn(a: DataNode, b: DataNode) {
     return -1;
   }
   else {
-    return collator.compare(a.key.toString(), b.key.toString());
+    const isChineseA = /[\u4e00-\u9fa5]/.test(a.key.toString());
+    const isChineseB = /[\u4e00-\u9fa5]/.test(b.key.toString());
+
+    if (isChineseA && isChineseB) {
+      return a.key.toString().localeCompare(b.key.toString(), 'zh', {numeric: true, caseFirst: 'lower'});
+    } else if (!isChineseA && !isChineseB) {
+      return a.key.toString().localeCompare(b.key.toString(), 'en', {numeric: true, caseFirst: 'lower'});
+    } else {
+      return isChineseA ? 1 : -1;
+    }
   }
 }
 
